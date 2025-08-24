@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "RpiUsbSim/1.0.0": {
+        "runtime": {
+          "RpiUsbSim.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RpiUsbSim/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

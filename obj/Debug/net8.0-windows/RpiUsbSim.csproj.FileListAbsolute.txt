@@ -1,0 +1,17 @@
+D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\RpiUsbSim.exe
+D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\RpiUsbSim.deps.json
+D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\RpiUsbSim.runtimeconfig.json
+D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\RpiUsbSim.dll
+D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\RpiUsbSim.pdb
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.csproj.GenerateResource.cache
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.GeneratedMSBuildEditorConfig.editorconfig
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.AssemblyInfoInputs.cache
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.AssemblyInfo.cs
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.csproj.CoreCompileInputs.cache
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.dll
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\refint\RpiUsbSim.dll
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.pdb
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.genruntimeconfig.cache
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\ref\RpiUsbSim.dll
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.SshConfig.resources
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.Main.Main.resources
