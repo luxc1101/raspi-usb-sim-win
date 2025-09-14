@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "vj3NIVPc5TU=",
+  "dgSpecHash": "1yWp3RKfnjs=",
   "success": true,
   "projectFilePath": "D:\\CodePro\\repos\\RpiUsbSim\\RpiUsbSim.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\ironm\\.nuget\\packages\\autoclosingmessagebox\\1.0.0.7\\autoclosingmessagebox.1.0.0.7.nupkg.sha512",
+    "C:\\Users\\ironm\\.nuget\\packages\\bouncycastle.cryptography\\2.5.1\\bouncycastle.cryptography.2.5.1.nupkg.sha512",
+    "C:\\Users\\ironm\\.nuget\\packages\\markdig\\0.42.0\\markdig.0.42.0.nupkg.sha512",
+    "C:\\Users\\ironm\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\ironm\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.3\\microsoft.extensions.logging.abstractions.8.0.3.nupkg.sha512",
+    "C:\\Users\\ironm\\.nuget\\packages\\ssh.net\\2025.0.0\\ssh.net.2025.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

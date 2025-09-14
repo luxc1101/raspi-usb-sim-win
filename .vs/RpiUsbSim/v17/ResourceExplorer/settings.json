@@ -1,13 +1,17 @@
 {
-  "ShowEmptyProjects": false,
+  "ShowEmptyProjects": true,
   "SelectedGroups": [],
-  "ExpandedProjects": [],
+  "ExpandedProjects": [
+    "D:\\CodePro\\repos\\RpiUsbSim\\RpiUsbSim.csproj"
+  ],
   "EnableSpellChecker": true,
   "ColumnOrder": [
     "name",
     "type",
     "neutral-value",
-    "neutral-comment"
+    "neutral-comment",
+    "file-path",
+    "file-name"
   ],
   "VisibleColumnKeys": [
     "name"

@@ -1,1 +1,13 @@
-{"SSHConf": {"_comment": "how to find IPAddress please check README.md", "Port": 22, "Username": "pi", "IP": "192.168.002.036", "Key": "pass", "Log": "session.log"}, "WiFi": {"_comment": "ssid and password", "SSID": "MagentaWLAN-25MQ", "Psk": "08220570084526563753"}}
+{
+  "SSHConf": {
+    "IP": "010,018,090,031",
+    "Username": "pi",
+    "Key": "pass",
+    "Port": 22,
+    "Log": "session.log"
+  },
+  "WiFi": {
+    "SSID": "MagentaWLAN-25MQ",
+    "Psk": "08220570084526563753"
+  }
+}

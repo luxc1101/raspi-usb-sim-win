@@ -8,11 +8,12 @@ namespace RpiUsbSim.Contracts
 {
     internal interface IWifiConnector
     {
+        IEnumerable<string> EnumerateAvailableSSIDs();
         void CreateWifiProfile(string ssid, string password);
         void RemoveWifiProfile(string profile);
-        bool isSSIDAvailable(string ssid);
-        string GetConnectedSSID();
-        void ConnectToWifi(string ssid);
-        bool isWifiConnected();
+        bool IsSelectedSSIDAvailable(string ssid);
+        string GetCurrentConnectedSSID();
+        void ConnectToSelectedSSID(string ssid);
+        bool IsSSIDAlreadyConnected();
     }
 }

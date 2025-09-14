@@ -8,12 +8,12 @@ namespace RpiUsbSim.Contracts
 {
     internal interface IRegexValidator
     {
-        bool validateIPAddress(string ipAddress);
-        bool validatePortNumber(string portNumber);
-        bool validateUsername(string username);
-        bool validateKey(string key);
-        bool validateLog(string log);
-        bool validateWiFiPassword(string password);
-        bool validateSSID(string ssid);
+        bool ValidateIPAddress(string ipAddress);
+        bool ValidatePortNumber(string portNumber);
+        bool ValidateUsername(string username);
+        bool ValidateKey(string key);
+        bool ValidateLog(string log);
+        bool ValidateWiFiPassword(string password);
+        bool ValidateSSID(string ssid);
     }
 }

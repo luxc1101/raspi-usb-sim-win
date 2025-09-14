@@ -1,4 +1,7 @@
 ﻿
+using System.Reflection.Metadata;
+using System.Windows.Forms;
+
 namespace RpiUsbSim
 {
     partial class SshLoginDialog
@@ -9,6 +12,8 @@ namespace RpiUsbSim
         private System.ComponentModel.IContainer components = null;
 
         private Size TextBoxSize = new Size(182, 23);
+
+        private Button btn_eye;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -84,7 +89,10 @@ namespace RpiUsbSim
 
         private void InitializeComponent()
         {
+            // this.Icon = Icon.FromHandle(Resources.ssh_connect.GetHicon());
+
             groupBox_SSH = new GroupBox();
+
             tableLayoutPanel_SSHConfig = new TableLayoutPanel();
             
             groupBox_wifi = new GroupBox();
@@ -110,8 +118,12 @@ namespace RpiUsbSim
                 Size = TextBoxSize,
                 TabIndex = 5,
                 Mask = "000.000.000.000",
-                Font = new Font("Courier New", 10)
+                PromptChar = '_',
+                InsertKeyMode = InsertKeyMode.Insert,
+                Font = new Font("Courier New", 10),
+                SelectionStart = 0,
             };
+
 
             panelMaskedTextBox.Controls.Add(maskedTextBox_ip);
 
@@ -227,7 +239,23 @@ namespace RpiUsbSim
             groupBox_wifi.TabIndex = 1;
             groupBox_wifi.TabStop = false;
             groupBox_wifi.Text = "WiFi";
-            //
+
+            // Create the eye button
+            btn_eye = new Button
+            {
+                BackColor = Color.Transparent,
+                Size = new Size(15, 15),
+                Location = new Point(TextBoxSize.Width - 25, 0),
+                FlatStyle = FlatStyle.Flat,
+                TabIndex = 3,
+                BackgroundImage = Resources.eye_closed,
+                BackgroundImageLayout = ImageLayout.Zoom,
+            };
+            btn_eye.FlatAppearance.BorderSize = 0;
+            btn_eye.FlatAppearance.MouseDownBackColor = Color.Transparent; // Transparent on click
+            btn_eye.FlatAppearance.MouseOverBackColor = Color.Transparent; // Transparent on hover
+            btn_eye.Click += btn_eye_Click;
+            // 
             // label_ssid
             //
             label_ssid = CreateLabel("SSID", new Point(3, 0), "label_ssid", 0);
@@ -238,7 +266,11 @@ namespace RpiUsbSim
             //
             // textBox_password
             //
+
             textBox_password = CreateTextBox(new Point(83, 30), "textBox_password", 3);
+            (textBox_password.Controls[0] as TextBox).Size = new Size(TextBoxSize.Width - 25, TextBoxSize.Height);
+            (textBox_password.Controls[0] as TextBox).UseSystemPasswordChar = true;
+            textBox_password.Controls.Add(btn_eye);
             // 
             // tableLayoutPanel_wifi
             // 
@@ -265,6 +297,7 @@ namespace RpiUsbSim
             // btn_cancel
             //
             btn_cancel = CreateButton("Cancel", new Point(73, 3), "btn_cancel", 3);
+            btn_cancel.Click += btn_cancel_Click;
             // 
             // btn_apply
             //
