@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "D:\\CodePro\\repos\\RpiUsbSim\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\helpdialog\\markdownread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:helpdialog\\markdownread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\contracts\\imarkdownreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:contracts\\imarkdownreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\helpdialog\\helpdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:helpdialog\\helpdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,16 +19,16 @@
       "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:helpdialog\\helpdialog.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\sshlogindialog\\sshlogindialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:sshlogindialog\\sshlogindialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\sshlogindialog\\wificonnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:sshlogindialog\\wificonnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\sshlogindialog\\loginconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:sshlogindialog\\loginconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\sshlogindialog\\sshlogindialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|solutionrelative:sshlogindialog\\sshlogindialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{88DE5CB5-8867-4620-9A64-02E70F0C9CB4}|RpiUsbSim.csproj|d:\\codepro\\repos\\rpiusbsim\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -34,59 +42,84 @@
       "DocumentGroups": [
         {
           "DockedWidth": 193,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "MarkDownRead.cs",
+              "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\MarkDownRead.cs",
+              "RelativeDocumentMoniker": "HelpDialog\\MarkDownRead.cs",
+              "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\MarkDownRead.cs",
+              "RelativeToolTip": "HelpDialog\\MarkDownRead.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAqwA0AAAClAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T19:48:53.361Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IMarkdownReader.cs",
+              "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\Contracts\\IMarkdownReader.cs",
+              "RelativeDocumentMoniker": "Contracts\\IMarkdownReader.cs",
+              "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\Contracts\\IMarkdownReader.cs",
+              "RelativeToolTip": "Contracts\\IMarkdownReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T19:44:30.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "WifiConnection.cs",
               "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\SSHLoginDialog\\WifiConnection.cs",
               "RelativeDocumentMoniker": "SSHLoginDialog\\WifiConnection.cs",
               "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\SSHLoginDialog\\WifiConnection.cs",
               "RelativeToolTip": "SSHLoginDialog\\WifiConnection.cs",
-              "ViewState": "AgIAAFkAAAAAAAAAAAAIwGAAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAC8AAAAAAAAAAAA9wGAAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-14T17:56:07.368Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "HelpDialog.Designer.cs",
               "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\HelpDialog.Designer.cs",
               "RelativeDocumentMoniker": "HelpDialog\\HelpDialog.Designer.cs",
               "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\HelpDialog.Designer.cs",
               "RelativeToolTip": "HelpDialog\\HelpDialog.Designer.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAxwHsAAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAQwIwAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-11T22:05:37.521Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "HelpDialog.cs",
               "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\HelpDialog.cs",
               "RelativeDocumentMoniker": "HelpDialog\\HelpDialog.cs",
               "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\HelpDialog\\HelpDialog.cs",
               "RelativeToolTip": "HelpDialog\\HelpDialog.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAAAkwDUAAAACAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABAAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-11T22:05:11.875Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "LoginConfiguration.cs",
               "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\SSHLoginDialog\\LoginConfiguration.cs",
               "RelativeDocumentMoniker": "SSHLoginDialog\\LoginConfiguration.cs",
               "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\SSHLoginDialog\\LoginConfiguration.cs",
               "RelativeToolTip": "SSHLoginDialog\\LoginConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-31T18:57:31.119Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-31T18:57:31.119Z"
             },
             {
               "$type": "Document",
@@ -96,14 +129,14 @@
               "RelativeDocumentMoniker": "SSHLoginDialog\\SshLoginDialog.cs",
               "ToolTip": "D:\\CodePro\\repos\\RpiUsbSim\\SSHLoginDialog\\SshLoginDialog.cs",
               "RelativeToolTip": "SSHLoginDialog\\SshLoginDialog.cs",
-              "ViewState": "AgIAAOAAAAAAAAAAAAAmwBgAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABIAAABOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-15T13:35:40.155Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\CodePro\\repos\\RpiUsbSim\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -111,8 +144,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-15T13:34:57.931Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-15T13:34:57.931Z"
             }
           ]
         }
