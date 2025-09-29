@@ -14,13 +14,14 @@ namespace RpiUsbSim
         public string Key { get; set; } = string.Empty;
         public int Port { get; set; } = 22;  
         public string Log { get; set; } = string.Empty;
-        public string SSID { get; set; } = string.Empty;
-        public string Psk { get; set; } = string.Empty;
+       
         public string ConfigFile { get { return loginConfiguration.ConfigFile; } }
 
         private readonly RegexValidation regexValidation = new RegexValidation();
         private readonly WifiConnection wifiConnection = new WifiConnection();
         private readonly LoginConfiguration loginConfiguration = new LoginConfiguration();
+        private SSHConnectionInfo? sshConnectionInfo = null;
+        public event Action<SSHConnectionInfo> SSHConnectionEstablished;
 
         public SshLoginDialog()
         {
@@ -33,15 +34,15 @@ namespace RpiUsbSim
             LoadConfigJsonFile();          
         }
 
-        private ConfigModel TryGetValidConfig()
-        {  
+        private ConfigModel? TryGetValidConfig()
+        {
             if (!loginConfiguration.IsFileExisting(ConfigFile))
             {
                 MessageBox.Show($"Config file not found at {ConfigFile}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
             ConfigModel dictConfiguration = loginConfiguration.LoadConfiguration(ConfigFile);
-            if (!loginConfiguration.IsConfigValid(dictConfiguration)) 
+            if (!loginConfiguration.IsConfigValid(dictConfiguration))
             {
                 MessageBox.Show("Configuration file is invalid or missing required fields.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
@@ -124,9 +125,9 @@ namespace RpiUsbSim
             }
         }
 
+        // Ersetzen Sie die Signatur von btn_connect_Click durch void, nicht DialogResult
         private void btn_connect_Click(object sender, EventArgs e)
         {
-
             if (ValidateInputs())
             {
                 int tryTimes = 3;
@@ -135,19 +136,19 @@ namespace RpiUsbSim
                     return;
                 if (ConnectToWifi(tryTimes))
                 {
-                    IP = RegexValidation.NormalizeIP(maskedTextBox_ip.Text.Replace(',', '.'));
-                    Port = int.TryParse(textBox_port.Controls[0].Text, out int port) ? port : 22;
-                    Username = textBox_user.Controls[0].Text;
-                    Key = textBox_key.Controls[0].Text;
-                    Log = textBox_log.Controls[0].Text;
-                    SSID = comboBox_ssid.Text;
-                    Psk = textBox_password.Controls[0].Text;
+                    sshConnectionInfo = new SSHConnectionInfo();
+                    sshConnectionInfo.Host = RegexValidation.NormalizeIP(maskedTextBox_ip.Text.Replace(',', '.'));
+                    sshConnectionInfo.Port = int.TryParse(textBox_port.Controls[0].Text, out int port) ? port : 22;
+                    sshConnectionInfo.Username = textBox_user.Controls[0].Text;
+                    sshConnectionInfo.Password = textBox_key.Controls[0].Text;
+                    sshConnectionInfo.Log = textBox_log.Controls[0].Text;
+                    SSHConnectionEstablished?.Invoke(sshConnectionInfo);
                     WriteConfigJsonFile(toShowMsg: false);
+                    this.DialogResult = DialogResult.OK; // Set the dialog result to OK
                     this.Close();
                 }
             }
-        }
-
+        }
         private void btn_cancel_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -159,6 +160,12 @@ namespace RpiUsbSim
             {
                 WriteConfigJsonFile();
             }
+        }
+
+        private void btn_help_Click(object sender, EventArgs e) 
+        {
+            var helpDialog = new SSHLoginDialog.SSHHelpDialog.SshHelpDialog();
+            helpDialog.ShowDialog();
         }
 
         private void comboBox_ssid_DropDown(object sender, EventArgs e)
@@ -196,7 +203,7 @@ namespace RpiUsbSim
             return false;
         }
 
-        private static void BlinkTestControl(Control textControl, Color blickColor, int durationMs = 600, int intervalMS = 150)
+        private static void BlinkTextControl(Control textControl, Color blinkColor, int durationMs = 600, int intervalMS = 150)
         {
             Color originalColor = textControl.BackColor;
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
@@ -207,7 +214,7 @@ namespace RpiUsbSim
             timer.Tick += (s, e) =>
             {
                 toggler = !toggler;
-                textControl.BackColor = toggler ? blickColor : originalColor;
+                textControl.BackColor = toggler ? blinkColor : originalColor;
 
                 elapsed += intervalMS;
                 if (elapsed >= durationMs)
@@ -225,48 +232,48 @@ namespace RpiUsbSim
             if (!regexValidation.ValidateIPAddress(maskedTextBox_ip.Text))
             {
                 AutoClosingMsgBox.Show("Invalid IP address format.", caption: "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(maskedTextBox_ip, Color.Yellow);
+                BlinkTextControl(maskedTextBox_ip, Color.Yellow);
                 return false;
             }
 
             else if (!regexValidation.ValidatePortNumber(textBox_port.Controls[0].Text))
             {
                 AutoClosingMsgBox.Show("Invalid Port number, please use default.", caption: "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(textBox_port.Controls[0], Color.Yellow);
+                BlinkTextControl(textBox_port.Controls[0], Color.Yellow);
                 return false;
             }
 
             else if (!regexValidation.ValidateUsername(textBox_user.Controls[0].Text))
             {
                 AutoClosingMsgBox.Show("Username cannot be empty.", caption: "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(textBox_user.Controls[0], Color.Yellow);
+                BlinkTextControl(textBox_user.Controls[0], Color.Yellow);
                 return false;
             }
 
             else if (!regexValidation.ValidateKey(textBox_key.Controls[0].Text))
             {
                 AutoClosingMsgBox.Show("Key cannot be empty.", "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(textBox_key.Controls[0], Color.Yellow);
+                BlinkTextControl(textBox_key.Controls[0], Color.Yellow);
                 return false;
             }
 
             else if (!regexValidation.ValidateLog(textBox_log.Controls[0].Text))
             {
                 AutoClosingMsgBox.Show("Log file must end with .log and cannot be empty.", "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(textBox_log.Controls[0], Color.Yellow);
+                BlinkTextControl(textBox_log.Controls[0], Color.Yellow);
                 return false;
             }
 
             else if (!regexValidation.ValidateWiFiPassword(textBox_password.Controls[0].Text))
             {
                 AutoClosingMsgBox.Show("WiFi password cannot be empty.", "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(textBox_password.Controls[0], Color.Yellow);
+                BlinkTextControl(textBox_password.Controls[0], Color.Yellow);
                 return false;
             }
             else if (!regexValidation.ValidateSSID(comboBox_ssid.Text))
             {
                 AutoClosingMsgBox.Show("SSID cannot be empty.", "Validation Error", boxIcon: MessageBoxIcon.Error);
-                BlinkTestControl(comboBox_ssid, Color.Yellow);
+                BlinkTextControl(comboBox_ssid, Color.Yellow);
                 return false;
             }
 

@@ -81,6 +81,8 @@ namespace RpiUsbSim.HelpDialog
             tableLayoutPanel_contact.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel_contact.Size = new Size(306, 15);
             tableLayoutPanel_contact.TabIndex = 5;
+            tableLayoutPanel_contact.AutoSize = true;
+            tableLayoutPanel_contact.Dock = DockStyle.Fill;
             // 
             // groupBox_helptext
             // 
@@ -90,6 +92,8 @@ namespace RpiUsbSim.HelpDialog
             groupBox_helptext.Size = new Size(306, 192);
             groupBox_helptext.TabIndex = 6;
             groupBox_helptext.TabStop = false;
+            groupBox_helptext.AutoSize = true;
+            groupBox_helptext.Dock = DockStyle.Fill;
             // 
             // tableLayoutPanel_helpdialog
             // 
@@ -105,6 +109,8 @@ namespace RpiUsbSim.HelpDialog
             tableLayoutPanel_helpdialog.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));
             tableLayoutPanel_helpdialog.Size = new Size(312, 219);
             tableLayoutPanel_helpdialog.TabIndex = 7;
+            tableLayoutPanel_helpdialog.AutoSize = true;
+            tableLayoutPanel_helpdialog.Dock = DockStyle.Fill;
             //
             // wevBrowser
             //
@@ -120,10 +126,10 @@ namespace RpiUsbSim.HelpDialog
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(334, 241);
+            ClientSize = new Size(600, 250);
             Controls.Add(tableLayoutPanel_helpdialog);
             Name = "HelpDialog";
-            Text = "HelpDialog";
+            Text = "Help";
             tableLayoutPanel_contact.ResumeLayout(false);
             tableLayoutPanel_contact.PerformLayout();
             tableLayoutPanel_helpdialog.ResumeLayout(false);
@@ -134,7 +140,6 @@ namespace RpiUsbSim.HelpDialog
 
         private Label label_contact;
         private LinkLabel linkLabel_autor;
-        private VScrollBar vScrollBar1;
         private TableLayoutPanel tableLayoutPanel_contact;
         private GroupBox groupBox_helptext;
         private TableLayoutPanel tableLayoutPanel_helpdialog;

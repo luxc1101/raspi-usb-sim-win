@@ -9,11 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Configuration\" />
-    <Folder Include="SSHLoginDialog\SSHHelpDialog\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoClosingMessageBox" Version="1.0.0.7" />
     <PackageReference Include="Markdig" Version="0.42.0" />
     <PackageReference Include="SSH.NET" Version="2025.0.0" />

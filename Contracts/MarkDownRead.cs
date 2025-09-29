@@ -1,17 +1,16 @@
-﻿using RpiUsbSim.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RpiUsbSim.HelpDialog
+namespace RpiUsbSim.Contracts
 {
     internal class MarkDownRead: IMarkdownReader
     {
         public MarkDownRead() { }
 
-        public string MakeDownFilePath { get; set; } = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Configuration", "UserGuids.md"));
+        public string MakeDownFilePath { get; set; } = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Configuration", "UserGuid.md"));
 
         public bool IsFileExist(string filePath)
         {
@@ -41,7 +40,7 @@ namespace RpiUsbSim.HelpDialog
     }
     h1 {
         font-size: 13px; /* Adjust the size of headings */
-        line-height: 0; /* Optional: Adjust line spacing for headings */
+        line-height: 1; /* Optional: Adjust line spacing for headings */
     }
     h2 {
         font-size: 12px;

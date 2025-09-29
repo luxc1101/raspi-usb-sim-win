@@ -7,6 +7,9 @@
     <Compile Update="Main\Main.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="SSHLoginDialog\SSHHelpDialog\SshHelpDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="SSHLoginDialog\SshLoginDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -32,8 +32,8 @@ namespace RpiUsbSim
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-         
-        private Panel CreateTextBox(Point point, string name, int tabidx)
+
+        private Panel CreateTextBox(Point point, string name, int tabidx, string placeholderText=null)
         {
             Panel panelbox = new Panel
             {
@@ -51,7 +51,8 @@ namespace RpiUsbSim
                 Name = name,
                 Size = TextBoxSize,
                 TabIndex = tabidx,
-                Font = new Font("Courier New", 10)
+                Font = new Font("Courier New", 10),
+                PlaceholderText = placeholderText
             };
             panelbox.Controls.Add(textBox);
 
@@ -89,7 +90,7 @@ namespace RpiUsbSim
 
         private void InitializeComponent()
         {
-            // this.Icon = Icon.FromHandle(Resources.ssh_connect.GetHicon());
+            this.Icon = Icon.FromHandle(Resources.ssh_connect.GetHicon());
 
             groupBox_SSH = new GroupBox();
 
@@ -177,7 +178,7 @@ namespace RpiUsbSim
             // 
             // textBox_port
             // 
-            textBox_port = CreateTextBox(new Point(83, 30), "textBox_port", 6);
+            textBox_port = CreateTextBox(new Point(83, 30), "textBox_port", 6, "SSH Default Port: 22");
             // 
             // label_user
             // 
@@ -185,7 +186,7 @@ namespace RpiUsbSim
             // 
             // textBox_user
             // 
-            textBox_user = CreateTextBox(new Point(83, 57), "textBox_user", 7);
+            textBox_user = CreateTextBox(new Point(83, 57), "textBox_user", 7, "SSH Default User: pi");
             // 
             // label_key
             // 
@@ -193,7 +194,7 @@ namespace RpiUsbSim
             // 
             // textBox_key
             // 
-            textBox_key = CreateTextBox(new Point(83, 84), "textBox_key", 8);
+            textBox_key = CreateTextBox(new Point(83, 84), "textBox_key", 8, "SSH Default Key: pass");
             // 
             // label_log
             // 
@@ -201,7 +202,7 @@ namespace RpiUsbSim
             // 
             // textBox_log
             // 
-            textBox_log = CreateTextBox(new Point(83, 111), "textBox_log", 9);
+            textBox_log = CreateTextBox(new Point(83, 111), "textBox_log", 9, "SSH Default Log: session.log");
             // 
             // tableLayoutPanel_SSHConfig
             // 
@@ -267,7 +268,7 @@ namespace RpiUsbSim
             // textBox_password
             //
 
-            textBox_password = CreateTextBox(new Point(83, 30), "textBox_password", 3);
+            textBox_password = CreateTextBox(new Point(83, 30), "textBox_password", 3, "WiFi password");
             (textBox_password.Controls[0] as TextBox).Size = new Size(TextBoxSize.Width - 25, TextBoxSize.Height);
             (textBox_password.Controls[0] as TextBox).UseSystemPasswordChar = true;
             textBox_password.Controls.Add(btn_eye);
@@ -306,7 +307,8 @@ namespace RpiUsbSim
             // 
             // btn_help
             //
-            btn_help = CreateButton("Help", new Point(213, 3), "btn_help", 5);  
+            btn_help = CreateButton("Help", new Point(213, 3), "btn_help", 5);
+            btn_help.Click += btn_help_Click;
             // 
             // tableLayoutPanel_btn
             // 

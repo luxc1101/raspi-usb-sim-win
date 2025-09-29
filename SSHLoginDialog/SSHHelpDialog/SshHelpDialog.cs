@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RpiUsbSim.Contracts;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,12 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Markdig;
-using RpiUsbSim.Contracts;
 
-namespace RpiUsbSim.HelpDialog
+namespace RpiUsbSim.SSHLoginDialog.SSHHelpDialog
 {
-    public partial class HelpDialog : Form
+    public partial class SshHelpDialog : Form
     {
         private readonly MarkDownRead mdRead = new MarkDownRead();
         private string? _mdHelpFile;
@@ -22,25 +21,17 @@ namespace RpiUsbSim.HelpDialog
             get => _mdHelpFile ?? mdRead.MakeDownFilePath;
             set => _mdHelpFile = value;
         }
-        public HelpDialog()
+        public SshHelpDialog()
         {
+            MDHelpFile = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Configuration", "SshLoginGuid.md"));
             InitializeComponent();
             LoadWebBrowserContent(MDHelpFile);
         }
-
         private void LoadWebBrowserContent(string mdHelpFile)
         {
             string htmlContent = mdRead.LoadMarkdownContentAndConvertToHtml(mdHelpFile);
             webBrowser.DocumentText = htmlContent;
         }
 
-        private void linkLabel_autor_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            var process = new Process();
-            process.StartInfo.FileName = "https://github.com/luxc1101";
-            process.StartInfo.UseShellExecute = true;
-            process.Start();
-            
-        }
     }
 }

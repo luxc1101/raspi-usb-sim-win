@@ -26,3 +26,4 @@ D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\AutoClosingMessageBox.dll
 D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.Resources.resources
 D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.HelpDialog.HelpDialog.resources
 D:\CodePro\repos\RpiUsbSim\bin\Debug\net8.0-windows\Markdig.dll
+D:\CodePro\repos\RpiUsbSim\obj\Debug\net8.0-windows\RpiUsbSim.SSHLoginDialog.SSHHelpDialog.SshHelpDialog.resources

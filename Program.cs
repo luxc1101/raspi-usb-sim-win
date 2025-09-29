@@ -12,7 +12,7 @@ namespace RpiUsbSim
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             // Application.Run(new SshLoginDialog());
-            Application.Run(new HelpDialog.HelpDialog());
+            Application.Run(new Main.Main());
         }
     }
 }

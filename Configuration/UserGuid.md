@@ -4,6 +4,7 @@
 The USB Emulator is a windows application tool. 
 It is designed to simplify the testing of USB devices and enhance the team's media-device testing capabilities
 
+---
 ## Precondition
 - Prepare hardware (RaspberryPi zero W, USB Mico-B Cable (OTG), USB Mico-B Cable (Power), microSD Card, etc.)
 - Plug in a fully prepared microSD card with the desired OS, necessary scripts, and installed packages
@@ -11,9 +12,11 @@ It is designed to simplify the testing of USB devices and enhance the team's med
 - Connect the Rpi OTG Port and the DUT through a USB Micro-B to USB-A/C cable
 - Plug in a USB WiFi receiver/adapter to the test PC (if your computer cannot receive WiFi without an adapter)
 
+---
 ## Configuration
 Click on SSH Connect (Raspberry icon) to configure the SSHClient and WiFi parameters and establish an SSH connection
 
+---
 ## Features
 
 ### Mass Storage Class (MSC):
