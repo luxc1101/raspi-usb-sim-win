@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,13 +17,18 @@ namespace RpiUsbSim.Main
     {
         private USBToolSshClient sshClient = new USBToolSshClient();
         private TraceTextDecorator beautyTrace = new TraceTextDecorator();
+
         public SshClient rpiSshClient { get; set; }
+        private SSHStatusMonitor? _sshStatusMonitor;
+        private SSHClientTraceUpdater? _sshClientTraceUpdater;
+        private bool _isSSHConnected = false;
 
         public Main()
         {
             InitializeComponent();
-            InitializeUSBToolState();
             rpiSshClient = sshClient.CreateClient(new SSHConnectionInfo());
+            InitSSHClientTraceUpdater();
+            StartSSHStatusMonitor();
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -33,67 +39,144 @@ namespace RpiUsbSim.Main
 
         private void toolStripButton_SSHConnect_Click(object sender, EventArgs e)
         {
-            var sshLogin = new SshLoginDialog();
-            sshLogin.SSHConnectionEstablished += OnSSHConnectionEstablished;
-            if (sshLogin.ShowDialog() == DialogResult.OK)
+            if (!_isSSHConnected)
             {
+                var sshLogin = new SshLoginDialog();
+                sshLogin.SSHConnectionEstablished += EstablishSSHConnection;
+                if (sshLogin.ShowDialog() == DialogResult.OK)
+                {
+                    sshLogin.Close();
+                }
             }
         }
 
-        private void OnSSHConnectionEstablished(SSHConnectionInfo sshConnectionInfo)
+        private void EstablishSSHConnection(SSHConnectionInfo sshConnectionInfo)
         {
             try
             {
-                // Create the SSH client and connect
                 rpiSshClient = sshClient.CreateClient(sshConnectionInfo);
-                // Check the connection status
                 if (!sshClient.GetSshConnectionStatus())
                 {
+                    UpdateSSHClientTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
+                    // UpdateTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                     sshClient.ConnectSsh(); // Attempt to connect
                 }
-                UpdateTrace(beautyTrace.CategoriesString("[INFO]: SSH connection established."));
-                // If connected, update the UI and send a test command
-                toolStripButton_SSHConnect.Enabled = false;
-                toolStripButton_SSHDisconnect.Enabled = true;
-
-                string result = sshClient.SendCommand("pwd");
-                UpdateTrace(beautyTrace.CategoriesString(result));
+                UpdateSSHClientTrace($"[INFO]: SSH connection established");
+                // UpdateTrace($"[INFO]: SSH connection established");
+                _isSSHConnected = sshClient.GetSshConnectionStatus();
+                Debug.WriteLine($"[DEBUG]: SSH Connection Status after connection attempt: {_isSSHConnected}");
+                if (_isSSHConnected)
+                {
+                    toolStripButton_Mount.Enabled = true;
+                    toolStripButton_Eject.Enabled = !toolStripButton_Mount.Enabled;
+                }
+                // string result = sshClient.SendCommand("python mount_robot.py 'MSC' 'FAT32' '_'");
+                // UpdateTrace(result);
             }
             catch (Exception ex)
             {
-                UpdateTrace(beautyTrace.CategoriesString(ex.Message));
+                UpdateTrace(ex.Message);
             }
+
         }
 
-        private void UpdateTrace(string rtfMessage)
+        private void UpdateTrace(string msg)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action<string>(UpdateTrace), rtfMessage);
+                Invoke(new Action<string>(UpdateTrace), msg);
                 return;
             }
+            string rtfMessage = beautyTrace.CategoriesString(msg);
             richTextBox_Trace.SelectedRtf = rtfMessage;
             richTextBox_Trace.AppendText(Environment.NewLine);
         }
 
         private void toolStripButton_SSHDisconnect_Click(object sender, EventArgs e)
         {
-            try 
+            try
             {
                 sshClient.DisconnectSsh();
-                toolStripButton_SSHConnect.Enabled = true;
-                toolStripButton_SSHDisconnect.Enabled = false;
+                UpdateSSHClientTrace($"[WARN]: SSH is disconnected!");
+                _isSSHConnected = sshClient.GetSshConnectionStatus();
+                _sshClientTraceUpdater?.Stop();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                UpdateTrace(beautyTrace.CategoriesString(ex.Message));
+                UpdateTrace(ex.Message);
             }
         }
 
         private void InitializeUSBToolState()
         {
-            toolStripButton_SSHConnect.Enabled = true;
-            toolStripButton_SSHDisconnect.Enabled = false;
+            toolStripButton_Mount.Enabled = false;
+            toolStripButton_Eject.Enabled = false;
+            toolStripButton_Clear.Enabled = true;
+            toolStripButton_Help.Enabled = true;
+            toolStripButton_Install.Enabled = false;
+            button_CMD.Enabled = false;
+            comboBox_CMD.Enabled = false;
+        }
+
+        private void StartSSHStatusMonitor()
+        {
+            _sshStatusMonitor = new SSHStatusMonitor(sshClient, UpdateSSHClientConnectionStatus);
+            _sshStatusMonitor.Start();
+        }
+
+        private void InitSSHClientTraceUpdater()
+        {
+            _sshClientTraceUpdater = new SSHClientTraceUpdater(UpdateTrace);
+        }
+
+        private void UpdateSSHClientConnectionStatus(bool isConnected)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<bool>(UpdateSSHClientConnectionStatus), isConnected);
+                return;
+            }
+            // Debug.WriteLine($"[DEBUG]: Updating SSH Connection Status: {_isSSHConnected}");
+            toolStripStatusLabel_Status.Text = isConnected ? "SSH Connected" : "SSH Disconnected";
+            toolStripStatusLabel_LED.Image = isConnected ? Resources.led_green : Resources.led_red;
+            toolStripButton_SSHConnect.Enabled = isConnected ? false : true;
+            toolStripButton_SSHDisconnect.Enabled = isConnected ? true : false;
+            toolStripButton_Install.Enabled = isConnected ? true : false;
+            button_CMD.Enabled = isConnected ? true : false;
+            comboBox_CMD.Enabled = isConnected ? true : false;
+            if (!_isSSHConnected)
+            {
+                InitializeUSBToolState();
+            }
+        }
+
+        private void toolStripButton_Clear_Click(object sender, EventArgs e)
+        {
+            richTextBox_Trace.Clear();
+        }
+
+        private void UpdateSSHClientTrace(string msg)
+        {
+            _sshClientTraceUpdater?.SetTraces(msg);
+            if (_sshClientTraceUpdater != null && !_sshClientTraceUpdater.IsRunning)
+            {
+                Debug.WriteLine($"[DEBUG]: Starting SSH Client Trace Updater");
+                _sshClientTraceUpdater?.Start();
+            }
+        }
+
+        private void button_CMD_Click(object sender, EventArgs e)
+        {
+            if (_isSSHConnected)
+            {
+                string command = comboBox_CMD.Text.ToString();
+                if (!string.IsNullOrEmpty(command))
+                {
+                    UpdateSSHClientTrace($"[USER]: {command}");
+                    
+                    // string result = sshClient.SendCommand(command);
+                }
+            }
         }
     }
 }

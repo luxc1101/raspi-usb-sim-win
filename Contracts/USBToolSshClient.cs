@@ -2,6 +2,7 @@
 using RpiUsbSim.Main;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace RpiUsbSim.Contracts
             {
                 e.CanTrust = true;
             };
+            // sshClient.KeepAliveInterval = TimeSpan.FromSeconds(10);
             return sshClient;
         }
 
@@ -42,6 +44,7 @@ namespace RpiUsbSim.Contracts
             try 
             {
                 sshClient?.Connect();
+                // sshClient.KeepAliveInterval = TimeSpan.FromSeconds(1);
             }
             catch (Exception ex)
             {
@@ -61,16 +64,19 @@ namespace RpiUsbSim.Contracts
             }
         }
         public bool GetSshConnectionStatus()
-        {   
-            if (sshClient == null) 
+        {
+            try
+            {
+                if (sshClient != null && sshClient.IsConnected)
+                {
+                    return true;   
+                }
+            }
+            catch
             {
                 return false;
             }
-            if (!sshClient.IsConnected) 
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public string SendCommand(string command)

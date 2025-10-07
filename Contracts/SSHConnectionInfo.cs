@@ -8,10 +8,10 @@ namespace RpiUsbSim.Contracts
 {
     public class SSHConnectionInfo
     {
-        public string Host { get; set; } = string.Empty;
+        public string Host { get; set; } = "000.000.000.000";
         public int Port { get; set; } = 22;
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Log { get; set; } = string.Empty;
+        public string Username { get; set; } = "pi";
+        public string Password { get; set; } = "pass";
+        public string Log { get; set; } = "session.log";
     }
 }

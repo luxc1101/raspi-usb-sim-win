@@ -96,9 +96,10 @@
             // toolStripStatusLabel_LED
             // 
             toolStripStatusLabel_LED.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripStatusLabel_LED.ImageTransparentColor = Color.Lime;
+            toolStripStatusLabel_LED.Image = Resources.led_red;
+            toolStripStatusLabel_LED.Margin = new Padding(5, 0, 5, 0);
             toolStripStatusLabel_LED.Name = "toolStripStatusLabel_LED";
-            toolStripStatusLabel_LED.Size = new Size(0, 17);
+            toolStripStatusLabel_LED.Size = new Size(16, 22);
             // 
             // toolStripStatusLabel_Status
             // 
@@ -110,15 +111,21 @@
             // 
             // toolStripStatusLabel_Version
             // 
+            toolStripStatusLabel_Version.Margin = new Padding(10, 3, 0, 3);
             toolStripStatusLabel_Version.Name = "toolStripStatusLabel_Version";
-            toolStripStatusLabel_Version.Size = new Size(0, 17);
+            toolStripStatusLabel_Version.Size = new Size(110, 16);
+            toolStripStatusLabel_Version.Spring = true;
+            toolStripStatusLabel_Version.Text = "Version: 1.0.0";
+            toolStripStatusLabel_Version.TextAlign = ContentAlignment.MiddleRight;
             // 
             // toolStripStatusLabel_Date
             // 
             toolStripStatusLabel_Date.Margin = new Padding(0, 3, 0, 3);
             toolStripStatusLabel_Date.Name = "toolStripStatusLabel_Date";
-            toolStripStatusLabel_Date.Size = new Size(95, 16);
-            toolStripStatusLabel_Date.Text = "Date: 2025-09-21";
+            toolStripStatusLabel_Date.Size = new Size(120, 16);
+            toolStripStatusLabel_Date.Spring = true;
+            toolStripStatusLabel_Date.Text = "Date: 2025-10-03";
+            toolStripStatusLabel_Date.TextAlign = ContentAlignment.MiddleRight;
             // 
             // toolBar
             // 
@@ -198,6 +205,7 @@
             toolStripButton_Clear.Name = "toolStripButton_Clear";
             toolStripButton_Clear.Size = new Size(29, 32);
             toolStripButton_Clear.Text = "Clear Trace Window";
+            toolStripButton_Clear.Click += toolStripButton_Clear_Click;
             // 
             // toolStripButton_Install
             // 
@@ -425,6 +433,7 @@
             button_CMD.TabIndex = 0;
             button_CMD.Text = "Send";
             button_CMD.UseVisualStyleBackColor = true;
+            button_CMD.Click += button_CMD_Click;
             // 
             // comboBox_CMD
             // 

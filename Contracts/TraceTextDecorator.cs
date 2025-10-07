@@ -36,9 +36,9 @@ namespace RpiUsbSim.Contracts
                 string cleanMsg = msg.Replace("[INFO]: ", "").Trim();
                 return DecorateText(cleanMsg, 3);
             }
-            else if (msg.Contains("DEBUG")) 
+            else if (msg.Contains("USER")) 
             {
-                string cleanMsg = msg.Replace("[DEBUG]: ", "").Trim();
+                string cleanMsg = msg.Replace("[USER]: ", "").Trim();
                 return DecorateText(cleanMsg, 4);
             }
             else 
@@ -56,8 +56,8 @@ namespace RpiUsbSim.Contracts
             rtf.Append(@"{\colortbl;
                         \red255\green0\blue0;
                         \red255\green165\blue0;
-                        \red0\green0\blue255;
-                        \red0\green128\blue0;
+                        \red173\green216\blue230;
+                        \red198\green157\blue235;
                         \red50\green205\blue50;}");
             rtf.Append($@"\cf{colorIndex}\b {msg}\b0\cf0 "); // Apply bold and color and reset to default
             rtf.Append(@"}");
