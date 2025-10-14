@@ -21,6 +21,7 @@ namespace RpiUsbSim.Main
         public SshClient rpiSshClient { get; set; }
         private SSHStatusMonitor? _sshStatusMonitor;
         private SSHClientTraceUpdater? _sshClientTraceUpdater;
+        private SSHCommandRunner? _sshCommandRunner;
         private bool _isSSHConnected = false;
 
         public Main()
@@ -28,7 +29,9 @@ namespace RpiUsbSim.Main
             InitializeComponent();
             rpiSshClient = sshClient.CreateClient(new SSHConnectionInfo());
             InitSSHClientTraceUpdater();
+            InitSSHCommandRunner();
             StartSSHStatusMonitor();
+            
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -55,9 +58,9 @@ namespace RpiUsbSim.Main
             try
             {
                 rpiSshClient = sshClient.CreateClient(sshConnectionInfo);
+                UpdateSSHClientTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                 if (!sshClient.GetSshConnectionStatus())
                 {
-                    UpdateSSHClientTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                     // UpdateTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                     sshClient.ConnectSsh(); // Attempt to connect
                 }
@@ -87,9 +90,16 @@ namespace RpiUsbSim.Main
                 Invoke(new Action<string>(UpdateTrace), msg);
                 return;
             }
+
+            if (!richTextBox_Trace.Text.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(richTextBox_Trace.Text))
+            {
+                richTextBox_Trace.AppendText(Environment.NewLine);
+            }
+
             string rtfMessage = beautyTrace.CategoriesString(msg);
             richTextBox_Trace.SelectedRtf = rtfMessage;
-            richTextBox_Trace.AppendText(Environment.NewLine);
+            richTextBox_Trace.SelectionStart = richTextBox_Trace.Text.Length;
+            richTextBox_Trace.ScrollToCaret();
         }
 
         private void toolStripButton_SSHDisconnect_Click(object sender, EventArgs e)
@@ -129,6 +139,11 @@ namespace RpiUsbSim.Main
             _sshClientTraceUpdater = new SSHClientTraceUpdater(UpdateTrace);
         }
 
+        private void InitSSHCommandRunner()
+        {
+            _sshCommandRunner = new SSHCommandRunner(sshClient, UpdateTrace);
+        }
+
         private void UpdateSSHClientConnectionStatus(bool isConnected)
         {
             if (InvokeRequired)
@@ -165,6 +180,16 @@ namespace RpiUsbSim.Main
             }
         }
 
+        private void UpdateCmdExecution(string cmd)
+        {
+            _sshCommandRunner?.SetCommand(cmd);
+            if (_sshCommandRunner != null && !_sshCommandRunner.IsRunning)
+            {
+                Debug.WriteLine($"[DEBUG]: Starting SSH Command Runner");
+                _sshCommandRunner?.Start();
+            }
+        }
+
         private void button_CMD_Click(object sender, EventArgs e)
         {
             if (_isSSHConnected)
@@ -173,9 +198,14 @@ namespace RpiUsbSim.Main
                 if (!string.IsNullOrEmpty(command))
                 {
                     UpdateSSHClientTrace($"[USER]: {command}");
-                    
+                    UpdateCmdExecution(command);
+
                     // string result = sshClient.SendCommand(command);
                 }
+            }
+            else
+            {
+                UpdateSSHClientTrace("[WARN]: SSH is not connected. Please connect to SSH first.");
             }
         }
     }
