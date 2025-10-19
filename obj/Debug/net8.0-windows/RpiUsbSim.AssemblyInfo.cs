@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RpiUsbSim")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1d4192b045931c50852402e2a808e3ef4b23d05f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+381f75fd7255834214a60871e595d3e9a81ef8ec")]
 [assembly: System.Reflection.AssemblyProductAttribute("RpiUsbSim")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RpiUsbSim")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

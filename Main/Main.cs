@@ -31,7 +31,7 @@ namespace RpiUsbSim.Main
             InitSSHClientTraceUpdater();
             InitSSHCommandRunner();
             StartSSHStatusMonitor();
-            
+
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -61,11 +61,9 @@ namespace RpiUsbSim.Main
                 UpdateSSHClientTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                 if (!sshClient.GetSshConnectionStatus())
                 {
-                    // UpdateTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
                     sshClient.ConnectSsh(); // Attempt to connect
                 }
                 UpdateSSHClientTrace($"[INFO]: SSH connection established");
-                // UpdateTrace($"[INFO]: SSH connection established");
                 _isSSHConnected = sshClient.GetSshConnectionStatus();
                 Debug.WriteLine($"[DEBUG]: SSH Connection Status after connection attempt: {_isSSHConnected}");
                 if (_isSSHConnected)
@@ -73,8 +71,6 @@ namespace RpiUsbSim.Main
                     toolStripButton_Mount.Enabled = true;
                     toolStripButton_Eject.Enabled = !toolStripButton_Mount.Enabled;
                 }
-                // string result = sshClient.SendCommand("python mount_robot.py 'MSC' 'FAT32' '_'");
-                // UpdateTrace(result);
             }
             catch (Exception ex)
             {
@@ -199,8 +195,6 @@ namespace RpiUsbSim.Main
                 {
                     UpdateSSHClientTrace($"[USER]: {command}");
                     UpdateCmdExecution(command);
-
-                    // string result = sshClient.SendCommand(command);
                 }
             }
             else
@@ -208,5 +202,6 @@ namespace RpiUsbSim.Main
                 UpdateSSHClientTrace("[WARN]: SSH is not connected. Please connect to SSH first.");
             }
         }
+
     }
 }
