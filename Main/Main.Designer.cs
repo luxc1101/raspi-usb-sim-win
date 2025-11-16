@@ -415,8 +415,6 @@
             // checkBox_autoMount
             // 
             checkBox_autoMount.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            checkBox_autoMount.Checked = true;
-            checkBox_autoMount.CheckState = CheckState.Checked;
             checkBox_autoMount.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             checkBox_autoMount.Location = new Point(267, 1);
             checkBox_autoMount.Margin = new Padding(8, 1, 3, 3);
@@ -532,6 +530,7 @@
             // comboBox_MSC
             // 
             comboBox_MSC.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            comboBox_MSC.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox_MSC.FormattingEnabled = true;
             comboBox_MSC.Location = new Point(3, 6);
             comboBox_MSC.Margin = new Padding(3, 6, 3, 3);
@@ -539,6 +538,7 @@
             comboBox_MSC.Name = "comboBox_MSC";
             comboBox_MSC.Size = new Size(289, 23);
             comboBox_MSC.TabIndex = 1;
+            comboBox_MSC.SelectedIndexChanged += comboBox_MSC_SelectedIndexChanged;
             // 
             // button_NAS
             // 

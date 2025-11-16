@@ -39,7 +39,7 @@ namespace RpiUsbSim.Main
                 try
                 {
                     bool isConnected = _sshClient.GetSshConnectionStatus();
-                    Debug.WriteLine($"[DEBUG]: SSH Connection Status: {isConnected}");
+                    // Debug.WriteLine($"[DEBUG]: SSH Status Monitor SSH Connection Status: {isConnected}");
                     _connectionStatusCallback(isConnected);
                 }
                 catch (Exception ex)

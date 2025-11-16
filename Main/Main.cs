@@ -1,5 +1,6 @@
 ﻿using Renci.SshNet;
 using RpiUsbSim.Contracts;
+using RpiUsbSim.SSHLoginDialog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,30 +9,40 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace RpiUsbSim.Main
 {
     public partial class Main : Form
     {
-        private USBToolSshClient sshClient = new USBToolSshClient();
-        private TraceTextDecorator beautyTrace = new TraceTextDecorator();
-
-        public SshClient rpiSshClient { get; set; }
-        private SSHStatusMonitor? _sshStatusMonitor;
-        private SSHClientTraceUpdater? _sshClientTraceUpdater;
-        private SSHCommandRunner? _sshCommandRunner;
+        private readonly USBToolSshClient sshClient = new USBToolSshClient();
+        private readonly TraceTextDecorator beautyTrace = new TraceTextDecorator();
+        private readonly Lazy<MSCDeviceClass> mscDevice;
+        private SSHStatusMonitor? sshStatusMonitor;
+        private SSHClientTraceUpdater? sshClientTraceUpdater;
+        private SSHCommandRunner? sshCommandRunner;
+        private string usbDeviceFile { get { return usbDeviceJsonRead.DeviceFile; } }
+        private UsbDeviceJsonRead usbDeviceJsonRead = new UsbDeviceJsonRead();
         private bool _isSSHConnected = false;
+        private Dictionary<string, (string img, string mnt)> mscDeviceDict = new Dictionary<string, (string img, string mnt)>();
 
         public Main()
         {
+            InitializeUISetup();
+            mscDevice = new Lazy<MSCDeviceClass>(() => new MSCDeviceClass(sshClient, mscDeviceDict), LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        private void InitializeUISetup() 
+        {
             InitializeComponent();
-            rpiSshClient = sshClient.CreateClient(new SSHConnectionInfo());
             InitSSHClientTraceUpdater();
+            LoadUSBDeviceToDropdownList();
+            sshClient.CreateClient(new SSHConnectionInfo());
             InitSSHCommandRunner();
             StartSSHStatusMonitor();
-
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -57,19 +68,20 @@ namespace RpiUsbSim.Main
         {
             try
             {
-                rpiSshClient = sshClient.CreateClient(sshConnectionInfo);
-                UpdateSSHClientTrace($"[INFO]: Host: {sshConnectionInfo.Host} is connecting");
+                sshClient.CreateClient(sshConnectionInfo);
                 if (!sshClient.GetSshConnectionStatus())
                 {
                     sshClient.ConnectSsh(); // Attempt to connect
                 }
-                UpdateSSHClientTrace($"[INFO]: SSH connection established");
+                UpdateSSHClientTrace($"[INFO]: Host {sshConnectionInfo.Host} connection established");
                 _isSSHConnected = sshClient.GetSshConnectionStatus();
                 Debug.WriteLine($"[DEBUG]: SSH Connection Status after connection attempt: {_isSSHConnected}");
                 if (_isSSHConnected)
                 {
                     toolStripButton_Mount.Enabled = true;
                     toolStripButton_Eject.Enabled = !toolStripButton_Mount.Enabled;
+                    mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+                    mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
                 }
             }
             catch (Exception ex)
@@ -105,7 +117,7 @@ namespace RpiUsbSim.Main
                 sshClient.DisconnectSsh();
                 UpdateSSHClientTrace($"[WARN]: SSH is disconnected!");
                 _isSSHConnected = sshClient.GetSshConnectionStatus();
-                _sshClientTraceUpdater?.Stop();
+                sshClientTraceUpdater?.Stop();
             }
             catch (Exception ex)
             {
@@ -126,18 +138,18 @@ namespace RpiUsbSim.Main
 
         private void StartSSHStatusMonitor()
         {
-            _sshStatusMonitor = new SSHStatusMonitor(sshClient, UpdateSSHClientConnectionStatus);
-            _sshStatusMonitor.Start();
+            sshStatusMonitor = new SSHStatusMonitor(sshClient, UpdateSSHClientConnectionStatus);
+            sshStatusMonitor.Start();
         }
 
         private void InitSSHClientTraceUpdater()
         {
-            _sshClientTraceUpdater = new SSHClientTraceUpdater(UpdateTrace);
+            sshClientTraceUpdater = new SSHClientTraceUpdater(UpdateTrace);
         }
 
         private void InitSSHCommandRunner()
         {
-            _sshCommandRunner = new SSHCommandRunner(sshClient, UpdateTrace);
+            sshCommandRunner = new SSHCommandRunner(sshClient, UpdateTrace);
         }
 
         private void UpdateSSHClientConnectionStatus(bool isConnected)
@@ -168,21 +180,21 @@ namespace RpiUsbSim.Main
 
         private void UpdateSSHClientTrace(string msg)
         {
-            _sshClientTraceUpdater?.SetTraces(msg);
-            if (_sshClientTraceUpdater != null && !_sshClientTraceUpdater.IsRunning)
+            sshClientTraceUpdater?.SetTraces(msg);
+            if (sshClientTraceUpdater != null && !sshClientTraceUpdater.IsRunning)
             {
                 Debug.WriteLine($"[DEBUG]: Starting SSH Client Trace Updater");
-                _sshClientTraceUpdater?.Start();
+                sshClientTraceUpdater?.Start();
             }
         }
 
         private void UpdateCmdExecution(string cmd)
         {
-            _sshCommandRunner?.SetCommand(cmd);
-            if (_sshCommandRunner != null && !_sshCommandRunner.IsRunning)
+            sshCommandRunner?.SetCommand(cmd);
+            if (sshCommandRunner != null && !sshCommandRunner.IsRunning)
             {
                 Debug.WriteLine($"[DEBUG]: Starting SSH Command Runner");
-                _sshCommandRunner?.Start();
+                sshCommandRunner?.Start();
             }
         }
 
@@ -203,5 +215,39 @@ namespace RpiUsbSim.Main
             }
         }
 
+        private void LoadUSBDeviceToDropdownList()
+        {
+            if (usbDeviceJsonRead.IsFileExisting(usbDeviceFile))
+            {
+                JsonNode rootNode = usbDeviceJsonRead.GetRootJsonNode();
+                JsonNode mscNode = usbDeviceJsonRead.GetMSCDeviceJsonNodeFromRoot();
+                JsonNode ecmNode = usbDeviceJsonRead.GetECMDeviceJsonNodeFromRoot();
+                JsonNode hidNode = usbDeviceJsonRead.GetHIDDeviceJsonNodeFromRoot();
+                JsonNode cdcNode = usbDeviceJsonRead.GetCDCDeviceJsonNodeFromRoot();
+                // Debug.WriteLine($"Node count {mscNode.AsArray().Count}");
+                if (!usbDeviceJsonRead.IsJsonNodeNull(mscNode) && mscNode is JsonArray mscNodeArray)
+                {
+                    for (int i = 0; i < mscNodeArray.Count; i++)
+                    {
+                        var mscdevice = mscNodeArray[i]?["dev"];
+                        var mscmnt = mscNodeArray[i]?["mnt"];
+                        var mscimg = mscNodeArray[i]?["img"];
+                        var mscValueTuple = (mscimg?.ToString() ?? string.Empty, mscmnt?.ToString() ?? string.Empty);
+                        mscDeviceDict.Add(mscdevice?.ToString() ?? string.Empty, mscValueTuple);
+
+                        if (mscdevice is not null) { comboBox_MSC.Items.Add(item: mscdevice); }
+                    }
+                    comboBox_MSC.SelectedIndex = 0;
+                }
+                else { Debug.WriteLine("[WARN]: JsonNode is null or unable as JsonArray"); }
+            }
+
+        }
+
+        private void comboBox_MSC_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (mscDevice == null) return;
+            mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+        }
     }
 }
