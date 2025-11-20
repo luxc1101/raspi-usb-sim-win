@@ -11,21 +11,21 @@ namespace RpiUsbSim.Main
 {
     internal class FilesystemSpaceMonitor
     {
-        private readonly USBToolSshClient _sshClient;
-        private readonly Action<Dictionary<string, object>> _filesystemSpaceCallback;
+        private readonly USBToolSshClient sshClient;
+        private readonly Action<Dictionary<string, object>> filesystemSpaceCallback;
         private string _mnt = string.Empty;
         public bool IsRunning = false;
-        private Dictionary<string, object> _filesystemSpaceData = new ()
+        private Dictionary<string, object> filesystemSpaceData = new ()
         {
             ["FSused"] = "unknown",
             ["FSavail"] = "unknown",
             ["Note"] = string.Empty 
         };
 
-        public FilesystemSpaceMonitor(USBToolSshClient sshClient, Action<Dictionary<string, object>> filesystemSpaceCallback)
+        public FilesystemSpaceMonitor(USBToolSshClient Client, Action<Dictionary<string, object>> fsSpaceCallback)
         {
-            _sshClient = sshClient;
-            _filesystemSpaceCallback = filesystemSpaceCallback;
+            sshClient = Client;
+            filesystemSpaceCallback = fsSpaceCallback;
         }
 
         public void SetMountPointPath(string mountPointPath)
@@ -54,19 +54,24 @@ namespace RpiUsbSim.Main
             {
                 try
                 {
-                    if (_sshClient.GetSshConnectionStatus()) 
+                    if (sshClient.GetSshConnectionStatus()) 
                     {
-                        string result = _sshClient.SendCommand($"df -Bm | grep -i '{_mnt}'");
+                        string result = sshClient.SendCommand($"df -Bm | grep -i '{_mnt}'");
                         if (string.IsNullOrWhiteSpace(result))
                         {
-                            _filesystemSpaceCallback(_filesystemSpaceData);
+                            filesystemSpaceData["FSused"] = "unknown";
+                            filesystemSpaceData["FSavail"] = "unknown";
+                            filesystemSpaceCallback(filesystemSpaceData);
                         }
                         else 
                         {
                             string FSusedStr = result.Split(' ', StringSplitOptions.RemoveEmptyEntries)[^2].TrimEnd('%');
                             int FSused = int.TryParse(FSusedStr, out var FSusedInt) ? FSusedInt : -1;
-                            _filesystemSpaceData["FSused"] = FSused;
-                            Debug.WriteLine($"[DEBUG] Filesystem used space: {FSused}%");
+                            string FsavailStr = result.Split(' ', StringSplitOptions.RemoveEmptyEntries)[3].TrimEnd('M');
+                            float FSavail = float.TryParse(FsavailStr, out var FSavailFloat) ? FSavailFloat : -1;
+                            filesystemSpaceData["FSused"] = FSused;
+                            filesystemSpaceData["FSavail"] = FSavail;
+                            filesystemSpaceCallback(filesystemSpaceData);
 
                         }
                     }
@@ -74,10 +79,10 @@ namespace RpiUsbSim.Main
                 }
                 catch (Exception ex)
                 {
-                    _filesystemSpaceCallback(_filesystemSpaceData);
+                    filesystemSpaceCallback(filesystemSpaceData);
                     throw new InvalidOperationException("[ERROR]: " + ex.Message);
                 }
-                await Task.Delay(2000); // Check every 2000 milliseconds
+                await Task.Delay(1000); // Check every 1000 milliseconds
             }
         }
 

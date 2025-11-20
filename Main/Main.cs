@@ -27,12 +27,12 @@ namespace RpiUsbSim.Main
         private string usbDeviceFile { get { return usbDeviceJsonRead.DeviceFile; } }
         private UsbDeviceJsonRead usbDeviceJsonRead = new UsbDeviceJsonRead();
         private bool _isSSHConnected = false;
-        private Dictionary<string, (string img, string mnt)> mscDeviceDict = new Dictionary<string, (string img, string mnt)>();
+    private Dictionary<string, (string img, string mnt)> mscDeviceDict = new Dictionary<string, (string img, string mnt)>();
 
         public Main()
         {
             InitializeUISetup();
-            mscDevice = new Lazy<MSCDeviceClass>(() => new MSCDeviceClass(sshClient, mscDeviceDict), LazyThreadSafetyMode.ExecutionAndPublication);
+            mscDevice = new Lazy<MSCDeviceClass>(() => new MSCDeviceClass(sshClient, mscDeviceDict, OnFilesystemSpaceUpdated), LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         private void InitializeUISetup() 
@@ -88,6 +88,51 @@ namespace RpiUsbSim.Main
             {
                 UpdateTrace(ex.Message);
             }
+
+        }
+
+        private void OnFilesystemSpaceUpdated(Dictionary<string, object> fsSpaceDict) 
+        {
+            // Ensure UI updates happen on UI thread
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => OnFilesystemSpaceUpdated(fsSpaceDict)));
+                return;
+            }
+
+            if (fsSpaceDict.TryGetValue("FSused", out var usedObj))
+            {
+                int usedSpace = usedObj is int used ? used : progressBar_space.Minimum;
+                //progressBar_space.Text = $"{usedObj} % Used";
+                SetProgressInstant(progressBar_space, usedSpace);
+            }
+
+        }
+
+        private void SetProgressInstant(ProgressBar bar, int value)
+        {
+            if (bar.InvokeRequired)
+            {
+                Invoke(new Action(() => SetProgressInstant(bar, value)));
+                return;
+            }
+
+            int clamped = Math.Clamp(value, bar.Minimum, bar.Maximum);
+            var prevStyle = bar.Style;
+
+            // Nudge technique: set value+1 then set the target value to avoid animation on increase
+            if (clamped == bar.Maximum)
+            {
+                bar.Value = bar.Maximum;
+            }
+            else
+            {
+                bar.Value = Math.Min(bar.Maximum, clamped + 1);
+                bar.Value = clamped;
+            }
+
+            bar.Refresh();         // force paint
+            Application.DoEvents(); // allow immediate repaint
 
         }
 
@@ -248,6 +293,7 @@ namespace RpiUsbSim.Main
         {
             if (mscDevice == null) return;
             mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+            mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
         }
     }
 }

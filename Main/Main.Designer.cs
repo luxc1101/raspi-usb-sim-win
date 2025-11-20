@@ -504,8 +504,10 @@
             // 
             progressBar_space.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             progressBar_space.Location = new Point(3, 3);
+            progressBar_space.MarqueeAnimationSpeed = 0;
             progressBar_space.Name = "progressBar_space";
             progressBar_space.Size = new Size(219, 20);
+            progressBar_space.Style = ProgressBarStyle.Continuous;
             progressBar_space.TabIndex = 8;
             // 
             // tableLayoutPanel1

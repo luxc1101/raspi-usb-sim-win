@@ -16,18 +16,20 @@ namespace RpiUsbSim.Main
         private USBToolSshClient sshClient;
         private Dictionary<string, (string img, string mnt)> mscDeviceDict;
         private FilesystemSpaceMonitor? filesystemSpaceMonitor;
+        private readonly Action<Dictionary<string, object>>? _uiCallback;
 
-        public MSCDeviceClass(USBToolSshClient client, Dictionary<string, (string img, string mnt)> deviceDict)
+        public MSCDeviceClass(USBToolSshClient client, Dictionary<string, (string img, string mnt)> deviceDict, Action<Dictionary<string, object>>? uiCallback = null)
         {
             sshClient = client;
             mscDeviceDict = deviceDict;
-            filesystemSpaceMonitor = new FilesystemSpaceMonitor(sshClient, new Action<Dictionary<string, object>>(GetFSImageDetails));
+            _uiCallback = uiCallback;
+            filesystemSpaceMonitor = new FilesystemSpaceMonitor(sshClient, new Action<Dictionary<string, object>>(OnFsMonitorUpdate));
         }
 
         public bool CheckMSCFileSystemImageExistence(string mscDeviceName)
         {
-            if (mscDeviceDict.TryGetValue(mscDeviceName, out var mscValueTuple) && sshClient.GetSshConnectionStatus()) 
-            { 
+            if (mscDeviceDict.TryGetValue(mscDeviceName, out var mscValueTuple) && sshClient.GetSshConnectionStatus())
+            {
                 string cmd = $"ls";
                 string result = sshClient.SendCommand(cmd);
                 Debug.WriteLine($"[DEBUG] value tumple image: {mscValueTuple.img}, mnt: {mscValueTuple.mnt}");
@@ -69,10 +71,21 @@ namespace RpiUsbSim.Main
                 }
             }
         }
-
-        private void GetFSImageDetails(Dictionary<string, object> fsSpaceDict)
+        public void OnFsMonitorUpdate(Dictionary<string, object> fsSpaceDict)
         {
-            Debug.WriteLine($"[DEBUG] Filesystem Space Info: {fsSpaceDict}");
+            if (fsSpaceDict.TryGetValue("FSused", out var used))
+            {
+                Debug.WriteLine($"[DEBUG] Filesystem used space (internal): {used}");
+            }
+            if (fsSpaceDict.TryGetValue("FSavail", out var avail))
+            {
+                Debug.WriteLine($"[DEBUG] Filesystem available space (internal): {avail}");
+            }
+            _uiCallback?.Invoke(fsSpaceDict);
         }
+        
+
     }
+
 }
+
