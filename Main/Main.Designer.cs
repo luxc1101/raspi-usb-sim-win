@@ -1,4 +1,6 @@
-﻿namespace RpiUsbSim.Main
+﻿using RpiUsbSim.Contracts;
+
+namespace RpiUsbSim.Main
 {
     partial class Main
     {
@@ -72,7 +74,7 @@
             tableLayoutPanel2 = new TableLayoutPanel();
             button_assign = new Button();
             numericUpDown_filesystemSize = new NumericUpDown();
-            progressBar_space = new ProgressBar();
+            progressBar_space = new TextProgressBar();
             tableLayoutPanel1 = new TableLayoutPanel();
             comboBox_MSC = new ComboBox();
             button_NAS = new Button();
@@ -200,6 +202,7 @@
             toolStripButton_Mount.Name = "toolStripButton_Mount";
             toolStripButton_Mount.Size = new Size(29, 32);
             toolStripButton_Mount.Text = "Mount";
+            toolStripButton_Mount.Click += toolStripButton_Mount_Click;
             // 
             // toolStripButton_Eject
             // 
@@ -360,7 +363,7 @@
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
             tabControl.Size = new Size(378, 122);
-            tabControl.SizeMode = TabSizeMode.Fixed;
+            tabControl.SizeMode = TabSizeMode.Normal;
             tabControl.TabIndex = 0;
             tabControl.Tag = "";
             // 
@@ -509,6 +512,10 @@
             progressBar_space.Size = new Size(219, 20);
             progressBar_space.Style = ProgressBarStyle.Continuous;
             progressBar_space.TabIndex = 8;
+            progressBar_space.VisualMode = ProgressBarDisplayMode.CustomText;
+            progressBar_space.CustomText = $"Used: {progressBar_space.Minimum}% (N/A MB free)";
+            progressBar_space.Value = progressBar_space.Minimum;
+            progressBar_space.TextFont = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             // 
             // tableLayoutPanel1
             // 
@@ -541,6 +548,7 @@
             comboBox_MSC.Size = new Size(289, 23);
             comboBox_MSC.TabIndex = 1;
             comboBox_MSC.SelectedIndexChanged += comboBox_MSC_SelectedIndexChanged;
+            comboBox_MSC.Enabled = false;
             // 
             // button_NAS
             // 
@@ -590,6 +598,7 @@
             tabPage_HID.TabIndex = 2;
             tabPage_HID.Text = "Human Interface Device";
             tabPage_HID.UseVisualStyleBackColor = true;
+            
             // 
             // tabPage_CDC
             // 
@@ -770,7 +779,8 @@
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
         private CheckBox checkBox_sharedFolder;
-        private ProgressBar progressBar_space;
+        // private ProgressBar progressBar_space;
+        private TextProgressBar progressBar_space;
         private TableLayoutPanel tableLayoutPanel3;
         private PictureBox pictureBox_statusLed;
         private Label label_status;

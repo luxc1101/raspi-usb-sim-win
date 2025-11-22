@@ -26,8 +26,14 @@ namespace RpiUsbSim.Main
         private SSHCommandRunner? sshCommandRunner;
         private string usbDeviceFile { get { return usbDeviceJsonRead.DeviceFile; } }
         private UsbDeviceJsonRead usbDeviceJsonRead = new UsbDeviceJsonRead();
-        private bool _isSSHConnected = false;
-    private Dictionary<string, (string img, string mnt)> mscDeviceDict = new Dictionary<string, (string img, string mnt)>();
+        private bool isSSHConnected = false;
+        private Dictionary<string, (string img, string mnt)> mscDeviceDict = new Dictionary<string, (string img, string mnt)>();
+        private Dictionary<string, object> paramdict = new Dictionary<string, object>
+        {
+            ["WaDo"] = 0,
+            ["Samba"] = 0,
+            ["Cmd"] = string.Empty
+        };
 
         public Main()
         {
@@ -39,10 +45,11 @@ namespace RpiUsbSim.Main
         {
             InitializeComponent();
             InitSSHClientTraceUpdater();
-            LoadUSBDeviceToDropdownList();
-            sshClient.CreateClient(new SSHConnectionInfo());
-            InitSSHCommandRunner();
             StartSSHStatusMonitor();
+            LoadUSBDeviceToDropdownList();
+            InitSSHCommandRunner();
+            sshClient.CreateClient(new SSHConnectionInfo());
+
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -53,7 +60,7 @@ namespace RpiUsbSim.Main
 
         private void toolStripButton_SSHConnect_Click(object sender, EventArgs e)
         {
-            if (!_isSSHConnected)
+            if (!isSSHConnected)
             {
                 var sshLogin = new SshLoginDialog();
                 sshLogin.SSHConnectionEstablished += EstablishSSHConnection;
@@ -61,6 +68,7 @@ namespace RpiUsbSim.Main
                 {
                     sshLogin.Close();
                 }
+                comboBox_MSC.Enabled = true;
             }
         }
 
@@ -74,9 +82,9 @@ namespace RpiUsbSim.Main
                     sshClient.ConnectSsh(); // Attempt to connect
                 }
                 UpdateSSHClientTrace($"[INFO]: Host {sshConnectionInfo.Host} connection established");
-                _isSSHConnected = sshClient.GetSshConnectionStatus();
-                Debug.WriteLine($"[DEBUG]: SSH Connection Status after connection attempt: {_isSSHConnected}");
-                if (_isSSHConnected)
+                isSSHConnected = sshClient.GetSshConnectionStatus();
+                Debug.WriteLine($"[DEBUG]: SSH Connection Status after connection attempt: {isSSHConnected}");
+                if (isSSHConnected)
                 {
                     toolStripButton_Mount.Enabled = true;
                     toolStripButton_Eject.Enabled = !toolStripButton_Mount.Enabled;
@@ -100,39 +108,18 @@ namespace RpiUsbSim.Main
                 return;
             }
 
-            if (fsSpaceDict.TryGetValue("FSused", out var usedObj))
+            if (fsSpaceDict.TryGetValue("FSused", out var usedObj) && fsSpaceDict.TryGetValue("FSavail", out var availObj))
             {
-                int usedSpace = usedObj is int used ? used : progressBar_space.Minimum;
-                //progressBar_space.Text = $"{usedObj} % Used";
-                SetProgressInstant(progressBar_space, usedSpace);
+                var usedSpace = usedObj is int used ? used : progressBar_space.Minimum;
+                var availSpace = availObj is float avail ? avail : fsSpaceDict["FSavail"];
+                progressBar_space.CustomText = $"Used: {usedSpace}% ({availSpace} MB free)";
+                progressBar_space.Value = (int)usedSpace;
             }
-
-        }
-
-        private void SetProgressInstant(ProgressBar bar, int value)
-        {
-            if (bar.InvokeRequired)
+            else 
             {
-                Invoke(new Action(() => SetProgressInstant(bar, value)));
-                return;
+                progressBar_space.CustomText = $"Used: {progressBar_space.Minimum}% (N/A MB free)";
+                progressBar_space.Value = progressBar_space.Minimum;
             }
-
-            int clamped = Math.Clamp(value, bar.Minimum, bar.Maximum);
-            var prevStyle = bar.Style;
-
-            // Nudge technique: set value+1 then set the target value to avoid animation on increase
-            if (clamped == bar.Maximum)
-            {
-                bar.Value = bar.Maximum;
-            }
-            else
-            {
-                bar.Value = Math.Min(bar.Maximum, clamped + 1);
-                bar.Value = clamped;
-            }
-
-            bar.Refresh();         // force paint
-            Application.DoEvents(); // allow immediate repaint
 
         }
 
@@ -155,14 +142,36 @@ namespace RpiUsbSim.Main
             richTextBox_Trace.ScrollToCaret();
         }
 
+        private void toolStripButton_Mount_Click(object sender, EventArgs e)
+        {
+            /* 
+             * mount devices
+             * tab 0: MSC
+             * tab 1: ECM
+             * tab 2: HID
+             * tab 3: CDC
+             * 
+             * python -u mount_app.py "{'WaDo': 0, 'Samba': 0, 'Cmd': 'MSC MIB Compliance Media'}"
+             */
+            if (tabControl.SelectedIndex == 0) // tab 0 MSC
+            {
+                paramdict["Cmd"] = $"MSC {comboBox_MSC.Text}";
+                string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+                Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
+                UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+            }
+            UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
+        }
+
         private void toolStripButton_SSHDisconnect_Click(object sender, EventArgs e)
         {
             try
             {
                 sshClient.DisconnectSsh();
                 UpdateSSHClientTrace($"[WARN]: SSH is disconnected!");
-                _isSSHConnected = sshClient.GetSshConnectionStatus();
+                isSSHConnected = sshClient.GetSshConnectionStatus();
                 sshClientTraceUpdater?.Stop();
+                comboBox_MSC.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -204,7 +213,7 @@ namespace RpiUsbSim.Main
                 Invoke(new Action<bool>(UpdateSSHClientConnectionStatus), isConnected);
                 return;
             }
-            // Debug.WriteLine($"[DEBUG]: Updating SSH Connection Status: {_isSSHConnected}");
+            // Debug.WriteLine($"[DEBUG]: Updating SSH Connection Status: {isSSHConnected}");
             toolStripStatusLabel_Status.Text = isConnected ? "SSH Connected" : "SSH Disconnected";
             toolStripStatusLabel_LED.Image = isConnected ? Resources.led_green : Resources.led_red;
             toolStripButton_SSHConnect.Enabled = isConnected ? false : true;
@@ -212,11 +221,12 @@ namespace RpiUsbSim.Main
             toolStripButton_Install.Enabled = isConnected ? true : false;
             button_CMD.Enabled = isConnected ? true : false;
             comboBox_CMD.Enabled = isConnected ? true : false;
-            if (!_isSSHConnected)
+            if (!isSSHConnected)
             {
                 InitializeUSBToolState();
             }
         }
+
 
         private void toolStripButton_Clear_Click(object sender, EventArgs e)
         {
@@ -245,7 +255,7 @@ namespace RpiUsbSim.Main
 
         private void button_CMD_Click(object sender, EventArgs e)
         {
-            if (_isSSHConnected)
+            if (isSSHConnected)
             {
                 string command = comboBox_CMD.Text.ToString();
                 if (!string.IsNullOrEmpty(command))

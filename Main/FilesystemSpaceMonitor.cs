@@ -17,8 +17,8 @@ namespace RpiUsbSim.Main
         public bool IsRunning = false;
         private Dictionary<string, object> filesystemSpaceData = new ()
         {
-            ["FSused"] = "unknown",
-            ["FSavail"] = "unknown",
+            ["FSused"] = "N/A",
+            ["FSavail"] = "N/A",
             ["Note"] = string.Empty 
         };
 
@@ -59,8 +59,8 @@ namespace RpiUsbSim.Main
                         string result = sshClient.SendCommand($"df -Bm | grep -i '{_mnt}'");
                         if (string.IsNullOrWhiteSpace(result))
                         {
-                            filesystemSpaceData["FSused"] = "unknown";
-                            filesystemSpaceData["FSavail"] = "unknown";
+                            filesystemSpaceData["FSused"] = "N/A";
+                            filesystemSpaceData["FSavail"] = "N/A";
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
                         else 
@@ -72,7 +72,6 @@ namespace RpiUsbSim.Main
                             filesystemSpaceData["FSused"] = FSused;
                             filesystemSpaceData["FSavail"] = FSavail;
                             filesystemSpaceCallback(filesystemSpaceData);
-
                         }
                     }
                     
