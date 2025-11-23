@@ -1,13 +1,14 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using RpiUsbSim.Contracts;
- using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace RpiUsbSim.Main
 {
@@ -52,15 +53,17 @@ namespace RpiUsbSim.Main
                 {
                     if (_sshClient.GetSshConnectionStatus() && !string.IsNullOrEmpty(_command))
                     {
+                        string assignedSize = _command.Split("fssize:", StringSplitOptions.RemoveEmptyEntries).Last();
+                        _command = _command.Split("fssize:", StringSplitOptions.RemoveEmptyEntries).First();
+                        Debug.WriteLine($"[DEBUG]: Parsed command is: {_command}, size input is: {assignedSize}");
+                        
                         using (var cmd = _sshClient.sshClient?.CreateCommand(_command))
                         {
-                            var result = cmd.BeginExecute();
-                            var streamStdout = cmd.OutputStream;
-                            var streamStderr = cmd.ExtendedOutputStream;
-                            var encoding = Encoding.UTF8;
-                            ReportStdout(streamStdout, encoding, result);
-                            ReportStderr(streamStderr, encoding, result);
-                            cmd.EndExecute(result);
+                            var asyncResult = cmd.BeginExecute();
+                            WriteUserInputFilesystemSize(assignedSize, cmd); // it has to write to cmd.CreateInputStream before finishing execution
+                            ReportStdout(cmd.OutputStream, Encoding.UTF8, asyncResult);
+                            ReportStderr(cmd.ExtendedOutputStream, Encoding.UTF8, asyncResult);
+                            cmd.EndExecute(asyncResult);
                         }
                     }
                     else
@@ -91,11 +94,11 @@ namespace RpiUsbSim.Main
                 {
                     string? line = reader.ReadLine();
                     if (line != null)
-                    {
+                    {   
                         line = line.Trim();
-                        // Debug.WriteLine(line);
                         _commandExecutionCallback(line);
                     }
+
                 }
             }
         }
@@ -112,6 +115,17 @@ namespace RpiUsbSim.Main
                         line = line.Trim();
                         _commandExecutionCallback($"[ERROR]: {line}");
                     }
+                }
+            }
+        }
+
+        private void WriteUserInputFilesystemSize(string sizeStr, SshCommand cmd)
+        {
+            if (int.TryParse(sizeStr, out int sizeInt))
+            {
+                using (var writer = new StreamWriter(cmd.CreateInputStream()))
+                {
+                    writer.WriteLine($"{sizeInt}");
                 }
             }
         }

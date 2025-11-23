@@ -158,7 +158,15 @@ namespace RpiUsbSim.Main
                 paramdict["Cmd"] = $"MSC {comboBox_MSC.Text}";
                 string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
                 Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
-                UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+                if (mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text))
+                {
+                    UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+                }
+                else
+                {
+                    int assignedFilesystemSizeMB = (int)numericUpDown_filesystemSize.Value <32 ? 32: (int)numericUpDown_filesystemSize.Value; // default min 32 MB
+                    UpdateCmdExecution($"python -u mount_app.py '{paramJson}'fssize:{assignedFilesystemSizeMB}");
+                }
             }
             UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
         }

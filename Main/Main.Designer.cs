@@ -502,6 +502,7 @@ namespace RpiUsbSim.Main
             numericUpDown_filesystemSize.Name = "numericUpDown_filesystemSize";
             numericUpDown_filesystemSize.Size = new Size(67, 22);
             numericUpDown_filesystemSize.TabIndex = 6;
+            numericUpDown_filesystemSize.Value = 32;
             // 
             // progressBar_space
             // 

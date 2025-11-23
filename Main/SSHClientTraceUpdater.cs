@@ -43,7 +43,7 @@ namespace RpiUsbSim.Main
         {
             while (_isUpdating)
             {
-                Debug.WriteLine($"[DEBUG]: Trace Queue Length: {_traces.Count}");
+                // Debug.WriteLine($"[DEBUG]: Trace Queue Length: {_traces.Count}");
                 if (_traces.Count > 0)
                 {
                     _singleTraceCallback(_traces.Dequeue());

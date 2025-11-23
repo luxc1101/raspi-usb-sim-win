@@ -63,7 +63,7 @@ namespace RpiUsbSim.Main
                             filesystemSpaceData["FSavail"] = "N/A";
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
-                        else 
+                        else if (!result.Contains("part"))
                         {
                             string FSusedStr = result.Split(' ', StringSplitOptions.RemoveEmptyEntries)[^2].TrimEnd('%');
                             int FSused = int.TryParse(FSusedStr, out var FSusedInt) ? FSusedInt : -1;
@@ -73,7 +73,12 @@ namespace RpiUsbSim.Main
                             filesystemSpaceData["FSavail"] = FSavail;
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
-                    }
+                        else //TODO: Handle partitioned mount points
+                        {
+                            filesystemSpaceData["FSused"] = "N/A";
+                            filesystemSpaceData["FSavail"] = "N/A";
+                            filesystemSpaceCallback(filesystemSpaceData);
+                        }
                     
                 }
                 catch (Exception ex)
