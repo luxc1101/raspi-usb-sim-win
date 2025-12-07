@@ -213,6 +213,7 @@ namespace RpiUsbSim.Main
             toolStripButton_Eject.Name = "toolStripButton_Eject";
             toolStripButton_Eject.Size = new Size(29, 32);
             toolStripButton_Eject.Text = "Eject";
+            toolStripButton_Eject.Click += toolStripButton_Eject_Click;
             // 
             // toolStripSeparator2
             // 
@@ -414,6 +415,8 @@ namespace RpiUsbSim.Main
             checkBox_sharedFolder.TabIndex = 8;
             checkBox_sharedFolder.Text = "Shared Folder";
             checkBox_sharedFolder.UseVisualStyleBackColor = false;
+            checkBox_autoMount.Enabled = false;
+            checkBox_sharedFolder.CheckedChanged += checkBox_sharedFolder_CheckedChanged;
             // 
             // checkBox_autoMount
             // 
@@ -428,6 +431,8 @@ namespace RpiUsbSim.Main
             checkBox_autoMount.TabIndex = 9;
             checkBox_autoMount.Text = "Auto Mount";
             checkBox_autoMount.UseVisualStyleBackColor = true;
+            checkBox_autoMount.Enabled = false;
+            checkBox_sharedFolder.CheckedChanged += checkBox_autoMount_CheckedChanged;
             // 
             // pictureBox_statusLed
             // 
@@ -565,6 +570,8 @@ namespace RpiUsbSim.Main
             button_NAS.TabIndex = 2;
             button_NAS.TabStop = false;
             button_NAS.UseVisualStyleBackColor = true;
+            // button_NAS.BackColor = Color.Magenta;
+            button_NAS.Enabled = false;
             // 
             // button_Delect
             // 
@@ -579,6 +586,7 @@ namespace RpiUsbSim.Main
             button_Delect.Size = new Size(30, 30);
             button_Delect.TabIndex = 3;
             button_Delect.UseVisualStyleBackColor = true;
+            button_Delect.Enabled = false;
             // 
             // tabPage_ECM
             // 

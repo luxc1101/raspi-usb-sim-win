@@ -34,6 +34,8 @@ namespace RpiUsbSim.Main
             ["Samba"] = 0,
             ["Cmd"] = string.Empty
         };
+        private bool isMountFinished = false;
+        private bool isEjectFiniehd = false;
 
         public Main()
         {
@@ -90,6 +92,9 @@ namespace RpiUsbSim.Main
                     toolStripButton_Eject.Enabled = !toolStripButton_Mount.Enabled;
                     mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
                     mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
+                    button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
+                    checkBox_autoMount.Enabled = true;
+                    checkBox_sharedFolder.Enabled = true;
                 }
             }
             catch (Exception ex)
@@ -108,12 +113,14 @@ namespace RpiUsbSim.Main
                 return;
             }
 
-            if (fsSpaceDict.TryGetValue("FSused", out var usedObj) && fsSpaceDict.TryGetValue("FSavail", out var availObj))
+            if (fsSpaceDict.TryGetValue("FSused", out var usedObj) && fsSpaceDict.TryGetValue("FSavail", out var availObj) && fsSpaceDict.TryGetValue("Note", out var noteObj))
             {
                 var usedSpace = usedObj is int used ? used : progressBar_space.Minimum;
                 var availSpace = availObj is float avail ? avail : fsSpaceDict["FSavail"];
-                progressBar_space.CustomText = $"Used: {usedSpace}% ({availSpace} MB free)";
+                string Note = (string)noteObj;
                 progressBar_space.Value = (int)usedSpace;
+                progressBar_space.CustomText = string.IsNullOrEmpty(Note) ? $"Used: {usedSpace}% ({availSpace} MB free)" : $"Used: {usedSpace}% ({availSpace} MB free, {Note})";
+
             }
             else 
             {
@@ -135,11 +142,40 @@ namespace RpiUsbSim.Main
             {
                 richTextBox_Trace.AppendText(Environment.NewLine);
             }
+            
+            if (msg.Contains("mount job finished"))
+            {
+                isMountFinished = true;
+                toolStripButton_Eject.Enabled = ! toolStripButton_Mount.Enabled;
+                button_NAS.Enabled = checkBox_sharedFolder.Checked;
+            }
+
+            if (msg.Contains("eject current mounted device")) 
+            {
+                isEjectFiniehd = true;
+                toolStripButton_Mount.Enabled = !toolStripButton_Eject.Enabled;
+            }
 
             string rtfMessage = beautyTrace.CategoriesString(msg);
             richTextBox_Trace.SelectedRtf = rtfMessage;
             richTextBox_Trace.SelectionStart = richTextBox_Trace.Text.Length;
             richTextBox_Trace.ScrollToCaret();
+        }
+
+        private void checkBox_autoMount_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSharedFolderCheckboxState();
+        }
+
+        private void checkBox_sharedFolder_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSharedFolderCheckboxState();
+        }
+
+        private void UpdateSharedFolderCheckboxState()
+        {
+            paramdict["WaDo"] = checkBox_autoMount.Checked ? 2 : 0;
+            paramdict["Samba"] = checkBox_sharedFolder.Checked ? 2 : 0;
         }
 
         private void toolStripButton_Mount_Click(object sender, EventArgs e)
@@ -156,6 +192,11 @@ namespace RpiUsbSim.Main
             if (tabControl.SelectedIndex == 0) // tab 0 MSC
             {
                 paramdict["Cmd"] = $"MSC {comboBox_MSC.Text}";
+                paramdict["WaDo"] = checkBox_autoMount.Checked ? 2 : 0;
+                paramdict["Samba"] = checkBox_sharedFolder.Checked ? 2 : 0;
+                toolStripButton_Mount.Enabled = toolStripButton_Eject.Enabled;
+                checkBox_sharedFolder.Enabled = toolStripButton_Mount.Enabled;
+                checkBox_autoMount.Enabled = toolStripButton_Mount.Enabled;
                 string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
                 Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
                 if (mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text))
@@ -167,7 +208,25 @@ namespace RpiUsbSim.Main
                     int assignedFilesystemSizeMB = (int)numericUpDown_filesystemSize.Value <32 ? 32: (int)numericUpDown_filesystemSize.Value; // default min 32 MB
                     UpdateCmdExecution($"python -u mount_app.py '{paramJson}'fssize:{assignedFilesystemSizeMB}");
                 }
+
             }
+            UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
+        }
+
+        private void toolStripButton_Eject_Click(object sender, EventArgs e)
+        {
+            /*
+             * eject current mounted device
+             * python -u mount_app.py "{'WaDo': 0, 'Samba': 0, 'Cmd': 'eject'}"
+             */
+            paramdict["Cmd"] = "EJECT";
+            toolStripButton_Eject.Enabled = toolStripButton_Mount.Enabled;
+            checkBox_sharedFolder.Enabled = !toolStripButton_Eject.Enabled;
+            checkBox_autoMount.Enabled = !toolStripButton_Eject.Enabled;
+            button_NAS.Enabled = toolStripButton_Eject.Enabled;
+            string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+            Debug.WriteLine($"[DEBUG]: Eject Command Param JSON: {paramJson}");
+            UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
             UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
         }
 
@@ -232,6 +291,10 @@ namespace RpiUsbSim.Main
             if (!isSSHConnected)
             {
                 InitializeUSBToolState();
+                button_Delect.Enabled = false;
+                button_NAS.Enabled = false;
+                checkBox_autoMount.Enabled = false;
+                checkBox_sharedFolder.Enabled = false;
             }
         }
 
@@ -312,6 +375,7 @@ namespace RpiUsbSim.Main
             if (mscDevice == null) return;
             mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
             mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
+            button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
         }
     }
 }

@@ -54,13 +54,14 @@ namespace RpiUsbSim.Main
             {
                 try
                 {
-                    if (sshClient.GetSshConnectionStatus()) 
+                    if (sshClient.GetSshConnectionStatus())
                     {
                         string result = sshClient.SendCommand($"df -Bm | grep -i '{_mnt}'");
                         if (string.IsNullOrWhiteSpace(result))
                         {
                             filesystemSpaceData["FSused"] = "N/A";
                             filesystemSpaceData["FSavail"] = "N/A";
+                            filesystemSpaceData["Note"] = string.Empty;
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
                         else if (!result.Contains("part"))
@@ -71,14 +72,35 @@ namespace RpiUsbSim.Main
                             float FSavail = float.TryParse(FsavailStr, out var FSavailFloat) ? FSavailFloat : -1;
                             filesystemSpaceData["FSused"] = FSused;
                             filesystemSpaceData["FSavail"] = FSavail;
+                            filesystemSpaceData["Note"] = string.Empty;
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
-                        else //TODO: Handle partitioned mount points
+                        else
                         {
-                            filesystemSpaceData["FSused"] = "N/A";
-                            filesystemSpaceData["FSavail"] = "N/A";
+                            var lines = result.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                            int lineslength = lines.Length;
+                            var FSusedList = new List<int>();
+                            var FSavailList = new List<float>();
+
+                            foreach (var item in lines)
+                            {
+                                string FSusedStr = item.Split(' ', StringSplitOptions.RemoveEmptyEntries)[^2].TrimEnd('%');
+                                int FSused = int.TryParse(FSusedStr, out var FSusedInt) ? FSusedInt : -1;
+                                FSusedList.Add(FSused);
+                                string FsavailStr = item.Split(' ', StringSplitOptions.RemoveEmptyEntries)[3].TrimEnd('M');
+                                float FSavail = float.TryParse(FsavailStr, out var FSavailFloat) ? FSavailFloat : -1;
+                                FSavailList.Add(FSavail);
+                            }
+                            int FSusedSum = FSusedList.Sum();
+                            float FSavailSum = FSavailList.Sum();
+                            Debug.WriteLine($"sum fs used {FSusedSum}");
+                            Debug.WriteLine($"sum Fa availab {FSavailSum}");
+                            filesystemSpaceData["FSused"] = FSusedSum;
+                            filesystemSpaceData["FSavail"] = FSavailSum;
+                            filesystemSpaceData["Note"] = "Multi partitions, values are summed";
                             filesystemSpaceCallback(filesystemSpaceData);
                         }
+                    }
                     
                 }
                 catch (Exception ex)
