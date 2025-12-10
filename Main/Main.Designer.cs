@@ -72,7 +72,7 @@ namespace RpiUsbSim.Main
             pictureBox_statusLed = new PictureBox();
             label_status = new Label();
             tableLayoutPanel2 = new TableLayoutPanel();
-            button_assign = new Button();
+            // button_assign = new Button();
             numericUpDown_filesystemSize = new NumericUpDown();
             progressBar_space = new TextProgressBar();
             tableLayoutPanel1 = new TableLayoutPanel();
@@ -464,11 +464,11 @@ namespace RpiUsbSim.Main
             tableLayoutPanel2.AutoScroll = true;
             tableLayoutPanel2.AutoScrollMinSize = new Size(365, 30);
             tableLayoutPanel2.AutoSize = true;
-            tableLayoutPanel2.ColumnCount = 3;
+            tableLayoutPanel2.ColumnCount = 2;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
-            tableLayoutPanel2.Controls.Add(button_assign, 2, 0);
+            // tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
+            // tableLayoutPanel2.Controls.Add(button_assign, 2, 0);
             tableLayoutPanel2.Controls.Add(numericUpDown_filesystemSize, 1, 0);
             tableLayoutPanel2.Controls.Add(progressBar_space, 0, 0);
             tableLayoutPanel2.Location = new Point(3, 36);
@@ -482,18 +482,18 @@ namespace RpiUsbSim.Main
             // 
             // button_assign
             // 
-            button_assign.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            button_assign.AutoSize = true;
-            button_assign.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button_assign.Location = new Point(296, 3);
-            button_assign.Margin = new Padding(1, 3, 3, 3);
-            button_assign.MaximumSize = new Size(68, 23);
-            button_assign.MinimumSize = new Size(68, 23);
-            button_assign.Name = "button_assign";
-            button_assign.Size = new Size(68, 23);
-            button_assign.TabIndex = 7;
-            button_assign.Text = "Assign";
-            button_assign.UseVisualStyleBackColor = true;
+            //button_assign.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            //button_assign.AutoSize = true;
+            //button_assign.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            //button_assign.Location = new Point(296, 3);
+            //button_assign.Margin = new Padding(1, 3, 3, 3);
+            //button_assign.MaximumSize = new Size(68, 23);
+            //button_assign.MinimumSize = new Size(68, 23);
+            //button_assign.Name = "button_assign";
+            //button_assign.Size = new Size(68, 23);
+            //button_assign.TabIndex = 7;
+            //button_assign.Text = "Assign";
+            //button_assign.UseVisualStyleBackColor = true;
             // 
             // numericUpDown_filesystemSize
             // 
@@ -587,6 +587,7 @@ namespace RpiUsbSim.Main
             button_Delect.TabIndex = 3;
             button_Delect.UseVisualStyleBackColor = true;
             button_Delect.Enabled = false;
+            button_Delect.Click += button_Delect_Click;
             // 
             // tabPage_ECM
             // 
@@ -782,7 +783,7 @@ namespace RpiUsbSim.Main
         private Button button_Delect;
         private Button button_NAS;
         private ComboBox comboBox_MSC;
-        private Button button_assign;
+        // private Button button_assign;
         private NumericUpDown numericUpDown_filesystemSize;
         private CheckBox checkBox_autoMount;
         private TableLayoutPanel tableLayoutPanel1;

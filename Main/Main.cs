@@ -13,6 +13,7 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using Markdig.Extensions.SelfPipeline;
 
 namespace RpiUsbSim.Main
 {
@@ -95,6 +96,7 @@ namespace RpiUsbSim.Main
                     button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
                     checkBox_autoMount.Enabled = true;
                     checkBox_sharedFolder.Enabled = true;
+                    numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
                 }
             }
             catch (Exception ex)
@@ -148,12 +150,22 @@ namespace RpiUsbSim.Main
                 isMountFinished = true;
                 toolStripButton_Eject.Enabled = ! toolStripButton_Mount.Enabled;
                 button_NAS.Enabled = checkBox_sharedFolder.Checked;
+                mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+                numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
             }
 
             if (msg.Contains("eject current mounted device")) 
             {
                 isEjectFiniehd = true;
                 toolStripButton_Mount.Enabled = !toolStripButton_Eject.Enabled;
+                mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+            }
+
+            if (msg.Contains("delete job finished")) 
+            {
+                mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
+                button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
+                numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
             }
 
             string rtfMessage = beautyTrace.CategoriesString(msg);
@@ -197,6 +209,7 @@ namespace RpiUsbSim.Main
                 toolStripButton_Mount.Enabled = toolStripButton_Eject.Enabled;
                 checkBox_sharedFolder.Enabled = toolStripButton_Mount.Enabled;
                 checkBox_autoMount.Enabled = toolStripButton_Mount.Enabled;
+                button_Delect.Enabled = toolStripButton_Mount.Enabled;
                 string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
                 Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
                 if (mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text))
@@ -213,6 +226,31 @@ namespace RpiUsbSim.Main
             UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
         }
 
+        private void button_NAS_Click(object sender, EventArgs e)
+        {
+            // TODO : implement NAS dialog
+        }
+
+        private void button_Delect_Click(object sender, EventArgs e)
+        {
+            /*
+             * delete current filesystem image
+             * python -u mount_app.py "{'WaDo': 0, 'Samba': 0, 'Cmd': 'delimg MSC MIB Compliance Media'}"
+             */
+            mscDeviceDict.TryGetValue(comboBox_MSC.Text, out var mscValueTuple);
+            paramdict["Cmd"] = $"DELETE {mscValueTuple.img.Split('.').First()}";
+            string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+            Debug.WriteLine($"[DEBUG]: Delete Image Command Param JSON: {paramJson}");
+            var dialogResult = MessageBox.Show($"ready to delete {mscValueTuple.img.Split('.').First()} file system?", "Delete Filesystem", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (dialogResult == DialogResult.OK)
+            {
+                UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+                UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
+            }
+            //UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+            //UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
+        }
+
         private void toolStripButton_Eject_Click(object sender, EventArgs e)
         {
             /*
@@ -224,6 +262,7 @@ namespace RpiUsbSim.Main
             checkBox_sharedFolder.Enabled = !toolStripButton_Eject.Enabled;
             checkBox_autoMount.Enabled = !toolStripButton_Eject.Enabled;
             button_NAS.Enabled = toolStripButton_Eject.Enabled;
+            button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
             string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
             Debug.WriteLine($"[DEBUG]: Eject Command Param JSON: {paramJson}");
             UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
@@ -255,6 +294,11 @@ namespace RpiUsbSim.Main
             toolStripButton_Install.Enabled = false;
             button_CMD.Enabled = false;
             comboBox_CMD.Enabled = false;
+            button_Delect.Enabled = false;
+            button_NAS.Enabled = false;
+            checkBox_autoMount.Enabled = false;
+            checkBox_sharedFolder.Enabled = false;
+            numericUpDown_filesystemSize.Enabled = false;
         }
 
         private void StartSSHStatusMonitor()
@@ -291,10 +335,6 @@ namespace RpiUsbSim.Main
             if (!isSSHConnected)
             {
                 InitializeUSBToolState();
-                button_Delect.Enabled = false;
-                button_NAS.Enabled = false;
-                checkBox_autoMount.Enabled = false;
-                checkBox_sharedFolder.Enabled = false;
             }
         }
 
@@ -376,6 +416,7 @@ namespace RpiUsbSim.Main
             mscDevice.Value.ChangeFileSystemLED(comboBox_MSC.Text, pictureBox_statusLed);
             mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
             button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
+            numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
         }
     }
 }
