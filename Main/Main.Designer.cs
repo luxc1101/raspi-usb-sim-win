@@ -9,6 +9,8 @@ namespace RpiUsbSim.Main
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        private ToolTip toolTip;
+
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -34,9 +36,20 @@ namespace RpiUsbSim.Main
             ToolStripStatusLabel toolStripStatusLabel = new ToolStripStatusLabel();
             return toolStripStatusLabel;
         }
+
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
+            
+            this.components = new System.ComponentModel.Container();
+            toolTip = new ToolTip(components)
+            {
+                AutoPopDelay = 5000,
+                InitialDelay = 1000,
+                ReshowDelay = 500,
+                ShowAlways = true
+            };
+
             statusStrip = new StatusStrip();
             toolStripStatusLabel_LED = new ToolStripStatusLabel();
             toolStripStatusLabel_Status = new ToolStripStatusLabel();
@@ -82,6 +95,7 @@ namespace RpiUsbSim.Main
             tabPage_ECM = new TabPage();
             tabPage_HID = new TabPage();
             tabPage_CDC = new TabPage();
+            tabPage_NCM = new TabPage();
             groupBox_Trace = new GroupBox();
             tableLayoutPanel_Trace = new TableLayoutPanel();
             tableLayoutPanel_CMD = new TableLayoutPanel();
@@ -358,6 +372,7 @@ namespace RpiUsbSim.Main
             tabControl.Controls.Add(tabPage_ECM);
             tabControl.Controls.Add(tabPage_HID);
             tabControl.Controls.Add(tabPage_CDC);
+            tabControl.Controls.Add(tabPage_NCM);
             tabControl.Location = new Point(3, 3);
             tabControl.MaximumSize = new Size(0, 122);
             tabControl.MinimumSize = new Size(378, 0);
@@ -570,8 +585,9 @@ namespace RpiUsbSim.Main
             button_NAS.TabIndex = 2;
             button_NAS.TabStop = false;
             button_NAS.UseVisualStyleBackColor = true;
-            // button_NAS.BackColor = Color.Magenta;
             button_NAS.Enabled = false;
+            toolTip.SetToolTip(button_NAS, "Open shared network folder for current MSC device");
+            button_NAS.Click += button_NAS_Click;
             // 
             // button_Delect
             // 
@@ -608,7 +624,6 @@ namespace RpiUsbSim.Main
             tabPage_HID.TabIndex = 2;
             tabPage_HID.Text = "Human Interface Device";
             tabPage_HID.UseVisualStyleBackColor = true;
-            
             // 
             // tabPage_CDC
             // 
@@ -619,6 +634,16 @@ namespace RpiUsbSim.Main
             tabPage_CDC.TabIndex = 3;
             tabPage_CDC.Text = "Communications Device Class";
             tabPage_CDC.UseVisualStyleBackColor = true;
+            //
+            // tabPage_NCM
+            //
+            tabPage_NCM.Location = new Point(4, 24);
+            tabPage_NCM.Name = "tabPage_NCM";
+            tabPage_NCM.Padding = new Padding(3);
+            tabPage_NCM.Size = new Size(370, 94);
+            tabPage_NCM.TabIndex = 3;
+            tabPage_NCM.Text = "Network Control Model";
+            tabPage_NCM.UseVisualStyleBackColor = true;
             // 
             // groupBox_Trace
             // 
@@ -688,6 +713,7 @@ namespace RpiUsbSim.Main
             comboBox_CMD.Name = "comboBox_CMD";
             comboBox_CMD.Size = new Size(250, 23);
             comboBox_CMD.TabIndex = 1;
+            comboBox_CMD.KeyDown += comboBox_CMD_KeyDown;
             // 
             // richTextBox_Trace
             // 
@@ -780,6 +806,7 @@ namespace RpiUsbSim.Main
         private TabPage tabPage_ECM;
         private TabPage tabPage_HID;
         private TabPage tabPage_CDC;
+        private TabPage tabPage_NCM;
         private Button button_Delect;
         private Button button_NAS;
         private ComboBox comboBox_MSC;

@@ -24,6 +24,6 @@ Click on SSH Connect (Raspberry icon) to configure the SSHClient and WiFi parame
 - If the selected FS exists, the LED will indicate its existence. If not, this file system will first be created first, 
 for which the tester must define parameters such as the disc size in the command window
 
-### USB Peripherals: (Ethernet Control Model, Human Interface Device, Communication Device Class)
-- The ECM, HID and CDC Tabs enable the user to test whether the DUT supports an emulated USB device. 
+### USB Peripherals: (Ethernet Control Model, Human Interface Device, Communication Device Class, Network Control Model)
+- The ECM, HID, CDC and NCM Tabs enable the user to test whether the DUT supports an emulated USB device. 
 - These tabs usually list all devices that could be mounted directly. However, if the tester wants to see if some device from beyond the list is supported, they must input its customized VID and PID numbers

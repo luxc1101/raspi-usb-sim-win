@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using Markdig.Extensions.SelfPipeline;
+using System.Diagnostics.Eventing.Reader;
 
 namespace RpiUsbSim.Main
 {
@@ -35,6 +36,7 @@ namespace RpiUsbSim.Main
             ["Samba"] = 0,
             ["Cmd"] = string.Empty
         };
+        private CommandDict commandDict = new CommandDict();
         private bool isMountFinished = false;
         private bool isEjectFiniehd = false;
 
@@ -48,11 +50,23 @@ namespace RpiUsbSim.Main
         {
             InitializeComponent();
             InitSSHClientTraceUpdater();
-            StartSSHStatusMonitor();
+            InitializeUSBToolState();
+            //StartSSHStatusMonitor();
             LoadUSBDeviceToDropdownList();
+            InitializeComboxBoxCMD();
             InitSSHCommandRunner();
             sshClient.CreateClient(new SSHConnectionInfo());
 
+        }
+
+        private void InitializeComboxBoxCMD() 
+        {
+            if (commandDict?.commandDictionary == null) return;
+
+            foreach (var key in commandDict.commandDictionary.Keys) 
+            {
+                comboBox_CMD.Items.Add(key);
+            }
         }
 
         private void toolStripButton_Help_Click(object sender, EventArgs e)
@@ -97,6 +111,7 @@ namespace RpiUsbSim.Main
                     checkBox_autoMount.Enabled = true;
                     checkBox_sharedFolder.Enabled = true;
                     numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
+                    StartSSHStatusMonitor();
                 }
             }
             catch (Exception ex)
@@ -194,24 +209,29 @@ namespace RpiUsbSim.Main
         {
             /* 
              * mount devices
+             * 
              * tab 0: MSC
              * tab 1: ECM
              * tab 2: HID
              * tab 3: CDC
+             * tab 4: NCM
              * 
-             * python -u mount_app.py "{'WaDo': 0, 'Samba': 0, 'Cmd': 'MSC MIB Compliance Media'}"
+             * example for MSC device: python -u mount_app.py "{'WaDo': 0, 'Samba': 0, 'Cmd': 'MSC MIB Compliance Media'}"
+             * example for MSC device: python -u mount_app.py "{'WaDo': 2, 'Samba': 2, 'Cmd': 'MSC FAT32'}"
              */
             if (tabControl.SelectedIndex == 0) // tab 0 MSC
             {
                 paramdict["Cmd"] = $"MSC {comboBox_MSC.Text}";
                 paramdict["WaDo"] = checkBox_autoMount.Checked ? 2 : 0;
                 paramdict["Samba"] = checkBox_sharedFolder.Checked ? 2 : 0;
+                string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+                Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
+
                 toolStripButton_Mount.Enabled = toolStripButton_Eject.Enabled;
                 checkBox_sharedFolder.Enabled = toolStripButton_Mount.Enabled;
                 checkBox_autoMount.Enabled = toolStripButton_Mount.Enabled;
                 button_Delect.Enabled = toolStripButton_Mount.Enabled;
-                string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
-                Debug.WriteLine($"[DEBUG]: Mount Command Param JSON: {paramJson}");
+                
                 if (mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text))
                 {
                     UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
@@ -228,7 +248,31 @@ namespace RpiUsbSim.Main
 
         private void button_NAS_Click(object sender, EventArgs e)
         {
-            // TODO : implement NAS dialog
+            if (checkBox_sharedFolder.Checked == false)
+            {
+                return;
+            }
+            else
+            {
+                string hostAddr = sshClient.GetConnectionInfo().Host;
+                mscDeviceDict.TryGetValue(comboBox_MSC.Text, out var mscValueTuple);
+                string folderName = $"raspisb_{mscValueTuple.img.Split('.').First()}";
+                string folderAddr = $@"\\{hostAddr}\{folderName}";
+                try
+                {
+                    var psi = new ProcessStartInfo(folderAddr)
+                    {
+                        UseShellExecute = true  // To open with Explorer from WinForms use the shell and set UseShellExecute = true
+                    };
+                    Process.Start(psi);
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[ERROR] Failed to open network folder '{folderAddr}': {ex.Message}");
+                    MessageBox.Show($"Unable to open network folder:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void button_Delect_Click(object sender, EventArgs e)
@@ -247,8 +291,6 @@ namespace RpiUsbSim.Main
                 UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
                 UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
             }
-            //UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
-            //UpdateSSHClientTrace($"[USER]: {paramdict["Cmd"]}");
         }
 
         private void toolStripButton_Eject_Click(object sender, EventArgs e)
@@ -287,6 +329,8 @@ namespace RpiUsbSim.Main
 
         private void InitializeUSBToolState()
         {
+            toolStripButton_SSHConnect.Enabled = true;
+            toolStripButton_SSHDisconnect.Enabled = false;
             toolStripButton_Mount.Enabled = false;
             toolStripButton_Eject.Enabled = false;
             toolStripButton_Clear.Enabled = true;
@@ -324,7 +368,7 @@ namespace RpiUsbSim.Main
                 Invoke(new Action<bool>(UpdateSSHClientConnectionStatus), isConnected);
                 return;
             }
-            // Debug.WriteLine($"[DEBUG]: Updating SSH Connection Status: {isSSHConnected}");
+            isSSHConnected = isConnected;
             toolStripStatusLabel_Status.Text = isConnected ? "SSH Connected" : "SSH Disconnected";
             toolStripStatusLabel_LED.Image = isConnected ? Resources.led_green : Resources.led_red;
             toolStripButton_SSHConnect.Enabled = isConnected ? false : true;
@@ -332,9 +376,12 @@ namespace RpiUsbSim.Main
             toolStripButton_Install.Enabled = isConnected ? true : false;
             button_CMD.Enabled = isConnected ? true : false;
             comboBox_CMD.Enabled = isConnected ? true : false;
-            if (!isSSHConnected)
+            Debug.WriteLine($"[DEBUG]: Updating SSH Connection Status: {isConnected}");
+            if (!isConnected)
             {
+                Debug.WriteLine($"[DEBUG] ==> InitializeUSBToolState()");
                 InitializeUSBToolState();
+                sshStatusMonitor?.Stop();
             }
         }
 
@@ -368,17 +415,62 @@ namespace RpiUsbSim.Main
         {
             if (isSSHConnected)
             {
-                string command = comboBox_CMD.Text.ToString();
+                string command = comboBox_CMD.Text.ToString().Trim()?? string.Empty;
+                
                 if (!string.IsNullOrEmpty(command))
                 {
                     UpdateSSHClientTrace($"[USER]: {command}");
-                    UpdateCmdExecution(command);
+                    if (commandDict?.commandDictionary != null && commandDict.commandDictionary.ContainsKey(command))
+                    {
+                        string value = commandDict.commandDictionary[command];
+                        if (command == "REMOUNT FILESYSTEM")
+                        {
+                            toolStripButton_Mount.Enabled = false;
+                            toolStripButton_Eject.Enabled = true;
+                            paramdict["Cmd"] = $"{value} {comboBox_MSC.Text}";
+                            string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+                            UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+                        }
+                        else if (command == "QUIT")
+                        {
+                            toolStripButton_Mount.Enabled = true;
+                            toolStripButton_Eject.Enabled = false;
+                            paramdict["Cmd"] = $"{value}";
+                            string paramJson = System.Text.Json.JsonSerializer.Serialize(paramdict);
+                            UpdateCmdExecution($"python -u mount_app.py '{paramJson}'");
+                        }
+                        else
+                        {
+                            UpdateCmdExecution(value);
+                        }
+                        
+                    }
+                    else
+                    {
+                        UpdateCmdExecution(command);
+                    }
+                    comboBox_CMD.Text = string.Empty;
                 }
             }
             else
             {
                 UpdateSSHClientTrace("[WARN]: SSH is not connected. Please connect to SSH first.");
             }
+        }
+
+        private void comboBox_CMD_KeyDown(object? sender, KeyEventArgs e) 
+        {
+            if (e.KeyCode == Keys.Enter) 
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+
+                if (button_CMD != null && button_CMD.Enabled) 
+                {
+                    button_CMD_Click(button_CMD, EventArgs.Empty);
+                }   
+            }
+        
         }
 
         private void LoadUSBDeviceToDropdownList()
@@ -417,6 +509,11 @@ namespace RpiUsbSim.Main
             mscDevice.Value.UpdateFSSpaceMonitor(comboBox_MSC.Text);
             button_Delect.Enabled = mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
             numericUpDown_filesystemSize.Enabled = !mscDevice.Value.CheckMSCFileSystemImageExistence(comboBox_MSC.Text);
+        }
+
+        private void ChangeTabWidgetsState(int tabID, bool mounted) 
+        {
+            // TOOD
         }
     }
 }

@@ -86,5 +86,18 @@ namespace RpiUsbSim.Contracts
             using SshCommand cmd = sshClient.RunCommand(command);
             return cmd.Result;
         }
+
+        public SSHConnectionInfo GetConnectionInfo()
+        {
+            if (sshClient == null)
+                throw new InvalidOperationException("[ERROR]: SSH Client is not initialized");
+            var connectionInfo = sshClient.ConnectionInfo;
+            return new SSHConnectionInfo
+            {
+                Host = connectionInfo.Host,
+                Port = connectionInfo.Port,
+                Username = connectionInfo.Username,
+            };
+        }
     }
 }

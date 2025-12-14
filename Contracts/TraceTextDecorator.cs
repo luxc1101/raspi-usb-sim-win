@@ -41,9 +41,15 @@ namespace RpiUsbSim.Contracts
                 string cleanMsg = msg.Replace("[USER]: ", "").Trim();
                 return DecorateText(cleanMsg, 4);
             }
+            else if (msg.Contains("status of samba service") || msg.Contains("status of watchdog service")) 
+            {
+                string cleanMsg = msg.Trim();
+                return DecorateText(cleanMsg, 5);
+            }
+
             else 
             {
-                return DecorateText(msg, 5);
+                return DecorateText(msg, 6);
             }
 
         }
@@ -58,6 +64,7 @@ namespace RpiUsbSim.Contracts
                         \red255\green165\blue0;
                         \red173\green216\blue230;
                         \red198\green157\blue235;
+                        \red0\green255\blue255;
                         \red50\green205\blue50;}");
             rtf.Append($@"\cf{colorIndex}\b {msg}\b0\cf0 "); // Apply bold and color and reset to default
             rtf.Append(@"}");

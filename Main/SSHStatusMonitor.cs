@@ -14,6 +14,8 @@ namespace RpiUsbSim.Main
         private readonly Action<bool> _connectionStatusCallback;
         private bool _isMonitoring;
         public bool IsRunning => _isMonitoring;
+        private CancellationTokenSource? _cts;
+        private Task? _monitoringTask;
 
         public SSHStatusMonitor(USBToolSshClient sshClient, Action<bool> connectionStatusCallback)
         {
@@ -24,17 +26,23 @@ namespace RpiUsbSim.Main
         public void Start() 
         {
             _isMonitoring = true;
-            Task.Run(() => MonitorConnection());
+            _cts = new CancellationTokenSource();
+            _monitoringTask = Task.Run(() => MonitorConnection(_cts.Token), CancellationToken.None);
         }
 
         public void Stop()
         {
             _isMonitoring = false;
+            _cts?.Cancel();
+            _monitoringTask?.Wait(TimeSpan.FromSeconds(2));
+            _cts?.Dispose();
+            _cts = null;
+            _monitoringTask = null;
         }
 
-        private async Task MonitorConnection()
+        private async Task MonitorConnection(CancellationToken token)
         {
-            while (_isMonitoring)
+            while (_isMonitoring && !token.IsCancellationRequested)
             {
                 try
                 {
