@@ -340,6 +340,7 @@ namespace RpiUsbSim
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            StartPosition = FormStartPosition.CenterParent;
             Name = "SshLoginDialog";
             Text = "Rpi SSH Connection";
             groupBox_SSH.ResumeLayout(false);

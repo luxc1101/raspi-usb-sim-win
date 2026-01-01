@@ -96,6 +96,7 @@ namespace RpiUsbSim.Main
             tabPage_HID = new TabPage();
             tabPage_CDC = new TabPage();
             tabPage_NCM = new TabPage();
+            tabPage_MTP = new TabPage();
             groupBox_Trace = new GroupBox();
             tableLayoutPanel_Trace = new TableLayoutPanel();
             tableLayoutPanel_CMD = new TableLayoutPanel();
@@ -254,6 +255,7 @@ namespace RpiUsbSim.Main
             toolStripButton_Install.Name = "toolStripButton_Install";
             toolStripButton_Install.Size = new Size(29, 32);
             toolStripButton_Install.Text = "Install USB Gadget";
+            toolStripButton_Install.Click += toolStripButton_Install_Click;
             // 
             // toolStripSeparator3
             // 
@@ -373,6 +375,7 @@ namespace RpiUsbSim.Main
             tabControl.Controls.Add(tabPage_HID);
             tabControl.Controls.Add(tabPage_CDC);
             tabControl.Controls.Add(tabPage_NCM);
+            tabControl.Controls.Add(tabPage_MTP);
             tabControl.Location = new Point(3, 3);
             tabControl.MaximumSize = new Size(0, 122);
             tabControl.MinimumSize = new Size(378, 0);
@@ -641,8 +644,18 @@ namespace RpiUsbSim.Main
             tabPage_NCM.Name = "tabPage_NCM";
             tabPage_NCM.Padding = new Padding(3);
             tabPage_NCM.Size = new Size(370, 94);
-            tabPage_NCM.TabIndex = 3;
+            tabPage_NCM.TabIndex = 4;
             tabPage_NCM.Text = "Network Control Model";
+            tabPage_NCM.UseVisualStyleBackColor = true;
+            //
+            // tabPage_MTP
+            //
+            tabPage_NCM.Location = new Point(4, 24);
+            tabPage_NCM.Name = "tabPage_MTP";
+            tabPage_NCM.Padding = new Padding(3);
+            tabPage_NCM.Size = new Size(370, 94);
+            tabPage_NCM.TabIndex = 5;
+            tabPage_NCM.Text = "Media Transfer Protocol";
             tabPage_NCM.UseVisualStyleBackColor = true;
             // 
             // groupBox_Trace
@@ -807,6 +820,7 @@ namespace RpiUsbSim.Main
         private TabPage tabPage_HID;
         private TabPage tabPage_CDC;
         private TabPage tabPage_NCM;
+        private TabPage tabPage_MTP;
         private Button button_Delect;
         private Button button_NAS;
         private ComboBox comboBox_MSC;

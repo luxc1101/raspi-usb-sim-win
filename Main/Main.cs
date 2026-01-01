@@ -75,6 +75,12 @@ namespace RpiUsbSim.Main
             userGuid.ShowDialog();
         }
 
+        private void toolStripButton_Install_Click(object sender, EventArgs e)
+        {
+            var installDialog = new InstallDialog();
+            installDialog.ShowDialog();
+        }
+
         private void toolStripButton_SSHConnect_Click(object sender, EventArgs e)
         {
             if (!isSSHConnected)
@@ -256,7 +262,7 @@ namespace RpiUsbSim.Main
             {
                 string hostAddr = sshClient.GetConnectionInfo().Host;
                 mscDeviceDict.TryGetValue(comboBox_MSC.Text, out var mscValueTuple);
-                string folderName = $"raspisb_{mscValueTuple.img.Split('.').First()}";
+                string folderName = $"raspiusb_{mscValueTuple.img.Split('.').First()}";
                 string folderAddr = $@"\\{hostAddr}\{folderName}";
                 try
                 {
